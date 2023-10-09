@@ -122,7 +122,7 @@ note: the android application cannot be deployed to Device Emulator or any non-Z
 4. Recommended: edit appsettings.json as you see fit (I recommend checking the Logfile output path)
 5. Optional: open Powershell 7 and execute this command to add the se server as a service (replace paths as needed):
     ```
-    New-Service -Name XRFID.Demo.Server -BinaryPathName ""{Path to publish folder}\XRFID.Demo.Server.exe" --contentRoot C:\{Path to publish folder}" -Description "XRFID Demo Server" -DisplayName "XRFID Demo Server" -StartupType AutomaticDelayedStart
+    New-Service -Name XRFID.Demo.Server -BinaryPathName "{Path to publish folder}\XRFID.Demo.Server.exe --contentRoot C:\{Path to publish folder}" -Description "XRFID Demo Server" -DisplayName "XRFID Demo Server" -StartupType AutomaticDelayedStart
     ```
 ### Connect Application 
 
