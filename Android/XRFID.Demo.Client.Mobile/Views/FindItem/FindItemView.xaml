@@ -31,11 +31,11 @@
                    FontSize="Medium"
                    FontAttributes="Bold"/>
 
-            <Button Grid.Column="1" ImageSource="info_icon.svg"                    
+            <!--<Button Grid.Column="1" ImageSource="info_icon.svg"                    
                     BackgroundColor="Transparent" 
                     Clicked="ShowInfoPage" 
                     HeightRequest="50" WidthRequest="65" 
-                    HorizontalOptions="End"/>
+                    HorizontalOptions="End"/>-->
         </Grid>
     </Shell.TitleView>
 
