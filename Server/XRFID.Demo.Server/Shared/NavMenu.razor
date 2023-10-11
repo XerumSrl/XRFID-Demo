@@ -1,4 +1,4 @@
-﻿<MudNavMenu Class="h-100">
+﻿<MudNavMenu Class="h-100" Style="positon:fixed;">
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
     <MudDivider Class="my-2" />
     <MudNavLink Href="CheckItems" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Checklist">Check RFID</MudNavLink>
@@ -6,24 +6,21 @@
     <MudDivider Class="my-2" />
     <MudNavGroup Title="Settings" Icon="@Icons.Material.Filled.Settings" Expanded="false">
         <MudNavLink Href="Settings" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Settings">Overview</MudNavLink>
-
         <MudNavLink Href="LoadingUnits" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Loading Units</MudNavLink>
-
         <MudNavLink Href="Skus" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddBox">Skus</MudNavLink>
-
         <MudNavLink Href="Products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Label">Products</MudNavLink>
-
         <MudNavLink Href="Readers" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ChromeReaderMode">Readers</MudNavLink>
-
         <MudNavLink Href="Printers" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Print">Printers</MudNavLink>
-
         <MudNavLink Href="Labels" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.NewLabel">Labels</MudNavLink>
-
     </MudNavGroup>
-        <MudIconButton Icon="@Icons.Material.Filled.Info" OnClick="@ToggleInfo" Class="mx-1"/>
-        <MudPopover Open="_open" OverflowBehavior="OverflowBehavior.FlipAlways" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Paper="true">
-            <About />
-        </MudPopover>
+    <MudDivider Class="my-2" />
+    <MudSpacer></MudSpacer>
+    <MudNavLink Icon="@Icons.Material.Filled.Info" OnClick="@ToggleInfo">Credits</MudNavLink>
+
+    <MudPopover Open="_open" OverflowBehavior="OverflowBehavior.FlipAlways" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Paper="true">
+        <About />
+    </MudPopover>
+    
 </MudNavMenu>
 
 @code{
