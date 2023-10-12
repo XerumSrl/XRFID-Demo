@@ -55,6 +55,33 @@ public class RestApiHelper
 
         return result;
     }
+
+    public async Task<ReaderDto?> RegisterReader(Guid id, string Hostname)
+    {
+        var request = new RestRequest("Reader/Minimal");
+        request.AddBody(new { id, Hostname }, ContentType.Json);
+
+        ReaderDto? result;
+
+        try
+        {
+            RestResponse response = await _client.PostAsync(request);
+            if ((int)response.StatusCode >= 400)
+            {
+                return null;
+            }
+            if (response.Content is null)
+            {
+                return null;
+            }
+            result = JsonSerializer.Deserialize<XResponseData<ReaderDto>>(response.Content)?.Result;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+        return result;
+    }
     #endregion
 
     #region Product
