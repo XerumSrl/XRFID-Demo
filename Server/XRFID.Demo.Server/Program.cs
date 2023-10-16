@@ -1,5 +1,6 @@
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting.WindowsServices;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using MQTTnet.AspNetCore;
@@ -95,8 +96,9 @@ try
     builder.Services.AddTransient<LabelService>();
     builder.Services.AddTransient<PrinterService>();
     #endregion
-
-    builder.Services.AddDbContext<XRFIDSampleContext>(optionsAction: options => options.UseSqlite("Data Source = Persist/persist.db"));
+    string DbConnection = "Data Source = " + (WindowsServiceHelpers.IsWindowsService() ? AppContext.BaseDirectory : null) + "Persist/persist.db";
+    Log.ForContext<Program>().Debug("DbPath: {db}", DbConnection.Substring(14));
+    builder.Services.AddDbContext<XRFIDSampleContext>(optionsAction: options => options.UseSqlite(DbConnection));
 
     #region RepositorySetup
     builder.Services.AddScoped<UnitOfWork>();

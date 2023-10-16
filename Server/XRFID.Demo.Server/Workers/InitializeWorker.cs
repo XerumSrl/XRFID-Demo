@@ -56,7 +56,7 @@ public sealed class InitializeWorker : IHostedService
             _logger.LogInformation("[StartAsync] Database: exists and has tables.");
         }
 
-        //demo data
+        // demo data
         if (!ctx.Skus.Any())
         {
             Random rng = new Random();
@@ -118,26 +118,26 @@ public sealed class InitializeWorker : IHostedService
                 Version = 1,
                 IsActive = true,
                 Content = @"~NORMAL
-~DELETE LOGO;*ALL
-~CREATE;LAB;97
-SCALE;DOT;203;203
-ISET;0
-FONT;FACE 92250;BOLD OFF;SLANT OFF
-ALPHA
-POINT;243;79;19;20;""{barcode}""
-STOP
-BARCODE
-C128C;XRD4:4:8:8:12:12:16:16;H4.92;22;31
-""'{barcode}""
-PDF;S
-STOP
-RFWTAG;96
-96;H;""{EPC}""
-STOP
-END
-~EXECUTE;LAB
+        ~DELETE LOGO;*ALL
+        ~CREATE;LAB;97
+        SCALE;DOT;203;203
+        ISET;0
+        FONT;FACE 92250;BOLD OFF;SLANT OFF
+        ALPHA
+        POINT;243;79;19;20;""{barcode}""
+        STOP
+        BARCODE
+        C128C;XRD4:4:8:8:12:12:16:16;H4.92;22;31
+        ""'{barcode}""
+        PDF;S
+        STOP
+        RFWTAG;96
+        96;H;""{EPC}""
+        STOP
+        END
+        ~EXECUTE;LAB
 
-~NORMAL"
+        ~NORMAL"
             };
             ctx.Labels.Add(l);
             await ctx.SaveChangesAsync();
