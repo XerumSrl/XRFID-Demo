@@ -110,6 +110,7 @@ public partial class RapidReadViewModel : BaseRfidViewModel, IDisposable
     }
     public override Task OnDisappearing()
     {
+        IsReading = false;
         HHTriggerEvent(false);
         Dispose(); //This dispose method is in base, but due to inherithance implementation details it calls the overridden UpdateOut()
         return base.OnDisappearing();
