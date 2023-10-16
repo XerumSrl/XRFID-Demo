@@ -34,7 +34,7 @@ public class TagDto
 
     public byte[] ByteTid { get; set; }
 
-    public string Antenna { get; set; }
+    public int Antenna { get; set; }
 
     public int InventoryId { get; set; }
 
