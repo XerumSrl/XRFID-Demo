@@ -65,7 +65,7 @@ public class ZebraTagData : IMqttTagData, IRequestMessage
     //ANTENNA
     [DataMember(Name = "antenna", EmitDefaultValue = false)]
     [JsonPropertyName("antenna")]
-    public string? Antenna { get; set; }
+    public short? Antenna { get; set; }
 
     /// <summary>
     /// The phase (in degrees) of the inventoried tag.
@@ -75,7 +75,7 @@ public class ZebraTagData : IMqttTagData, IRequestMessage
     /// <value>Host name of the reader</value>
     [DataMember(Name = "phase", EmitDefaultValue = false)]
     [JsonPropertyName("phase")]
-    public string? Phase { get; set; }
+    public float? Phase { get; set; }
 
     /// <summary>
     /// User Memory bits of the inventoried tag as a hex string.
@@ -93,7 +93,7 @@ public class ZebraTagData : IMqttTagData, IRequestMessage
     /// <value>Channel of the Tag</value>
     [DataMember(Name = "channel", EmitDefaultValue = false)]
     [JsonPropertyName("channel")]
-    public string? Channel { get; set; }
+    public float? Channel { get; set; }
 
     /// <summary>
     /// PC bits of the inventoried tag as a hex string.
