@@ -105,6 +105,8 @@
         </MudStack>
 
         <MudAlert Severity="@alertSeverity">@alertText</MudAlert>
+        <MudSpacer/>
+        <MudButton Color="Color.Secondary" Variant="Variant.Filled" OnClick="async ()=>await Reset()">Reset</MudButton>
     </MudStack>
 </MudStack>
 
@@ -180,7 +182,7 @@
     private Severity alertSeverity = Severity.Error;
     private string alertText = "RFID Stop";
 
-    private string listStyleString => (expectedItems == foundItems && expectedItems!=0)  ? $"color:{Colors.Shades.White}; background:{Colors.Green.Darken2}; width:50%" : $"color:{Colors.Shades.Black}; background:#dfdfdf; width:50%";
+    private string listStyleString => (expectedItems == foundItems && expectedItems!=0) ? $"color:{Colors.Shades.White}; background:{Colors.Green.Darken2}; width:50%" : $"color:{Colors.Shades.Black}; background:#dfdfdf; width:50%";
     private int expectedItems = 0;
     private int foundItems = 0;
 
@@ -199,7 +201,7 @@
         //When he receives it, it executes the lambda expression
         hubConnection.On("RefreshTag", async () =>
         {
-            Items = await Worker.GetViewItems();
+            Items = Worker.GetViewItems();
             foundItems = Items.Count(c => c.CheckStatus == CheckStatusEnum.Found);
             expectedItems = Items.Count(c => (c.CheckStatus == CheckStatusEnum.NotFound) || (c.CheckStatus == CheckStatusEnum.Found));
             unexpectedItems = Items.Count(c => c.CheckStatus == CheckStatusEnum.Error);
@@ -229,9 +231,9 @@
 
         if (!Items.Any())
         {
-            Items = await Worker.GetViewItems();
+            Items = Worker.GetViewItems();
         }
-        
+
     }
 
     //signalR connection open
@@ -408,5 +410,14 @@
         {
             await hubConnection.DisposeAsync();
         }
+    }
+
+    public async Task Reset()
+    {
+        unexpectedItems = 0;
+        foundItems = 0;
+        Worker.Reset();
+        Items = Worker.GetViewItems();
+        await InvokeAsync(StateHasChanged);
     }
 }

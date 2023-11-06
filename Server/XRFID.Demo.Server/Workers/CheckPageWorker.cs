@@ -20,7 +20,8 @@ public class CheckPageWorker
 
 
     private List<CheckItemModel> _viewItems = new List<CheckItemModel>();
-    private Guid ActiveId = Guid.Empty;
+    private int _itemCount = 0;
+    private Guid _activeId = Guid.Empty;
 
     private Movement _movement;
 
@@ -44,7 +45,7 @@ public class CheckPageWorker
 
     public async Task SetViewItem(string epc)
     {
-        CheckItemModel? foundItem = _viewItems.Where(w => w.Epc == epc).FirstOrDefault();
+        CheckItemModel? foundItem = _viewItems.Where(w => w.Epc.ToUpper() == epc.ToUpper()).FirstOrDefault();
         if (foundItem is not null)
         {
             if (foundItem.CheckStatus == CheckStatusEnum.NotFound)
@@ -52,11 +53,11 @@ public class CheckPageWorker
                 foundItem.CheckStatus = CheckStatusEnum.Found;
             }
 
-            foundItem.Direction = _movement?.Direction ?? Common.Enumerations.MovementDirection.In;
+            foundItem.Direction = _movement?.Direction ?? MovementDirection.In;
         }
         else
         {
-            var item = (await movementItemRepository.GetAsync(q => q.Epc == epc)).FirstOrDefault();
+            var item = (await movementItemRepository.GetAsync(q => q.Epc.ToUpper() == epc.ToUpper())).FirstOrDefault();
             if (item is null)
             {
                 return;
@@ -70,12 +71,12 @@ public class CheckPageWorker
                 CheckStatus = item.Status == ItemStatus.Found ? CheckStatusEnum.Found :
                                          (item.Status == ItemStatus.NotFound ? CheckStatusEnum.NotFound : CheckStatusEnum.Error),
                 DateTime = item.LastModificationTime,
-                Direction = _movement?.Direction ?? Common.Enumerations.MovementDirection.In,
+                Direction = _movement?.Direction ?? MovementDirection.In,
             });
         }
     }
 
-    public async Task<List<CheckItemModel>> GetViewItems()
+    public List<CheckItemModel> GetViewItems()
     {
         List<CheckItemModel> items = new List<CheckItemModel>();
         items = _viewItems.OrderByDescending(o => o.DateTime).ToList();
@@ -85,12 +86,12 @@ public class CheckPageWorker
 
     public async Task<bool> IdIsEqual(Guid Id)
     {
-        if (ActiveId == Id && ActiveId != Guid.Empty)
+        if (_activeId == Id && _activeId != Guid.Empty)
         {
             return true;
         }
 
-        ActiveId = Id;
+        _activeId = Id;
         _viewItems.Clear();
 
         _movement = await movementRepository.GetAsync(Id);
@@ -100,6 +101,8 @@ public class CheckPageWorker
         {
             throw new Exception("No items");
         }
+
+        _itemCount = itemList.Count;
 
         foreach (var item in itemList)
         {
@@ -160,5 +163,25 @@ public class CheckPageWorker
     public bool ItemsIsEmpty()
     {
         return !_viewItems.Any();
+    }
+
+    public void Reset()
+    {
+        int remainingItems = _itemCount;
+        List<CheckItemModel> items = new List<CheckItemModel>(_itemCount);
+        foreach (CheckItemModel item in _viewItems)
+        {
+            if (item.CheckStatus != CheckStatusEnum.Error)
+            {
+                item.CheckStatus = CheckStatusEnum.NotFound;
+                items.Add(item);
+                remainingItems--;
+                if (remainingItems == 0)//if i already found all the items from my lu I jump out of the loop
+                {
+                    break;
+                }
+            }
+        }
+        _viewItems = items;
     }
 }
