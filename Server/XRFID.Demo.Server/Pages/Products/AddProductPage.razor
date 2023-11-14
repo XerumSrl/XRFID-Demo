@@ -2,6 +2,7 @@
 @using System.Text.RegularExpressions;
 @using System.ComponentModel.DataAnnotations;
 @using XRFID.Demo.Server.Database;
+@using XRFID.Demo.Server.Entities;
 @using XRFID.Demo.Server.Repositories;
 @using XRFID.Demo.Server.ViewModels;
 @inject NavigationManager Navigation;
@@ -10,33 +11,67 @@
 @inject UnitOfWork uow;
 @inject ISnackbar snackbar;
 
-<h1>Add New Product</h1>
+<MudStack Row="true">
+    <h1>Add New Product</h1>
+    <MudSwitch T="bool" @bind-Checked="_multipleMode" Label="Add Multiple Product"></MudSwitch>
+</MudStack>
 
-<MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
-    <MudStack Class="my-3">
-        <MudSelect Label="Sku" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter"
-        @bind-Value="SelectedSku" Required="true" RequiredError="Please select a Sku before creating a product">
-            @foreach (var sku in SkuList.OrderBy(q => q.Code))
-            {
-                <MudSelectItem Value="@sku">@sku.Code - @sku.Description</MudSelectItem>
-            }
-        </MudSelect>
-        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
-        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Code" For="()=>model.Code" @bind-Value="model.Code" />
-        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Description" For="()=>model.Description" @bind-Value="model.Description" />
-        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="EPC" HelperText="24 or 32 characther HEX string"
-                      For="()=>model.Epc" @bind-Value="model.Epc" />
-        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Serial Number" For="()=>model.SerialNumber" @bind-Value="model.SerialNumber" />
+@if (!_multipleMode)
+{
+    <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+        <MudStack Class="my-3">
+            <MudSelect Label="Sku" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter"
+            @bind-Value="SelectedSku" Required="true" RequiredError="Please select a Sku before creating a product">
+                @foreach (var sku in SkuList.OrderBy(q => q.Code))
+                {
+                    <MudSelectItem Value="@sku">@sku.Code - @sku.Description</MudSelectItem>
+                }
+            </MudSelect>
+            <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
+            <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Code" For="()=>model.Code" @bind-Value="model.Code" />
+            <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Description" For="()=>model.Description" @bind-Value="model.Description" />
+            <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="EPC" HelperText="24 or 32 characther HEX string"
+                          For="()=>model.Epc" @bind-Value="model.Epc" />
+            <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Serial Number" For="()=>model.SerialNumber" @bind-Value="model.SerialNumber" />
 
-        <MudStack Row="true" Class="my-6 d-flex justify-end">
-            <MudButton OnClick="@(()=>form.ResetAsync())" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Reset</MudButton>
-            <MudButton OnClick="@(async ()=> await Submit())" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Submit</MudButton>
+            <MudStack Row="true" Class="my-6 d-flex justify-end">
+                <MudButton OnClick="@(()=>form.ResetAsync())" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Reset</MudButton>
+                <MudButton OnClick="@(async ()=> await Submit())" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Submit</MudButton>
+            </MudStack>
         </MudStack>
-    </MudStack>
-</MudForm>
+    </MudForm>
+}
+else
+{
+    <MudForm @ref="multiForm" Model="@multiModel">
+        <MudStack Class="my-3">
+            <MudSelect Label="Sku" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter"
+            @bind-Value="SelectedSku" Required="true" RequiredError="Please select a Sku before creating a product">
+                @foreach (var sku in SkuList.OrderBy(q => q.Code))
+                {
+                    <MudSelectItem Value="@sku">@sku.Code - @sku.Description</MudSelectItem>
+                }
+            </MudSelect>
+            <MudTextField T="string" Label="Code Prefix" @bind-Value="multiModel.CodePrefix" For="()=>multiModel.CodePrefix" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true"
+                          Validation="@(new Func<string, Task<string?>>(ValidateCodePrefix))" AutoFocus="true" />
+            <MudTextField T="string" Label="Epc Prefix" @bind-Value="multiModel.EpcPrefix" For="()=>multiModel.EpcPrefix" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" />
+            <MudNumericField Label="First Product #" @bind-Value="multiModel.StartIncremental" For="()=>multiModel.StartIncremental" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" />
+            <MudNumericField Label="Product #" @bind-Value="multiModel.NProd" For="()=>multiModel.NProd" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" />
+
+            <MudStack Row="true" Class="my-6 d-flex justify-end">
+                <MudButton OnClick="@(()=>form.ResetAsync())" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Reset</MudButton>
+                <MudButton OnClick="@(()=>MultiSubmit())" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Submit</MudButton>
+            </MudStack>
+        </MudStack>
+    </MudForm>
+}
+
+
 
 
 @code {
+    bool _multipleMode = false;
+
     bool success;
     string[] errors = { };
     MudForm form;
@@ -85,7 +120,7 @@
                 ContentQuantity = model.ContentQuantity,
                 SerialNumber = model.SerialNumber,
                 SkuId = SelectedSku.Id,
-
+                Sku = await skuRepository.GetAsync(SelectedSku.Id),
             });
         await uow.SaveAsync();
         //fare comparire un popup che inserimento ok e rimanare alla pagina
@@ -101,5 +136,104 @@
     {
         return !(await productRepository.GetAsync(q => q.Epc == epc)).Any();
     }
+
+    #region Multiple Add
+    MudForm? multiForm;
+    private AddMultipleProductsModel multiModel = new();
+    private async Task MultiSubmit()
+    {
+        if (multiForm is null)
+        {
+            return;
+        }
+        await multiForm.Validate();
+
+        if (!multiForm.IsValid)
+        {
+            return;
+        }
+
+        Sku? sku = new();
+        try
+        {
+            sku = await skuRepository.GetAsync(SelectedSku.Id);
+            if (sku is null)
+            {
+                throw new Exception($"Sku {SelectedSku.Id} is null");
+            }
+        }
+        catch (Exception ex)
+        {
+            snackbar.Add($"CREATION FAILED!!\nError: {ex.Message}", Severity.Error);
+            return;
+        }
+
+
+
+        List<Product> prods = new List<Product>(multiModel.NProd);
+
+        for (int i = 0; i < multiModel.NProd; i++)
+        {
+            string n = (multiModel.StartIncremental + i).ToString().PadLeft(8).Replace(' ', '0');
+            string code = $"{multiModel.CodePrefix}{n}";
+
+            string epc = $"{multiModel.EpcPrefix}{DateTime.Now.ToString("yyyyMMdd")}{code}";
+
+            prods.Add(new Product
+                {
+                    Name = code,
+                    Code = code,
+                    Reference = code,
+                    Description = $"Procedurally generated product {n}",
+                    Epc = epc,
+                    ContentQuantity = 1,
+                    SerialNumber = n,
+                    SkuId = multiModel.SkuId,
+                    Sku = sku,
+
+                    CreatorUserId = "AddPRoductPage",
+                    LastModifierUserId = "AddPRoductPage",
+                });
+        }
+
+        try
+        {
+            _ = await productRepository.CreateAsync(prods);
+            int save = await uow.SaveAsync();
+            if (save != multiModel.NProd)
+            {
+                throw new Exception($"Not all products have been added ({save}/{multiModel.NProd})");
+            }
+        }
+        catch (Exception ex)
+        {
+            snackbar.Add($"CREATION FAILED!!\nError: {ex.Message}", Severity.Error);
+            return;
+        }
+
+        snackbar.Add($"Products from {multiModel.StartIncremental} to {multiModel.StartIncremental + multiModel.NProd} created ({multiModel.NProd})", Severity.Success);
+    }
+
+    private async Task<string?> ValidateCodePrefix(string value)
+    {
+        Product? lastIncrementalProduct = productRepository.Query().Where(w => w.Code.Substring(0, 4).ToUpper() == value).OrderBy(o => o.Code).LastOrDefault();
+        if (lastIncrementalProduct is null)
+        {
+            multiModel.StartIncremental = 0;
+            return null;
+        }
+
+        try
+        {
+            multiModel.StartIncremental = int.Parse(lastIncrementalProduct.Code.Substring(4))+1;
+        }
+        catch (Exception)
+        {
+            multiModel.StartIncremental = 0;
+            return null;
+        }
+        return null;
+    }
+    #endregion
 
 }

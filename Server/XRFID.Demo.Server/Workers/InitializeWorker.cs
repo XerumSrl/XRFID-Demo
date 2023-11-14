@@ -57,38 +57,38 @@ public sealed class InitializeWorker : IHostedService
         }
 
         // demo data
-        if (!ctx.Skus.Any())
-        {
-            Random rng = new Random();
-            for (int i = 0; i < 16; i++)
-            {
-                Sku s = new Sku
-                {
-                    Name = $"sku_{i}",
-                    Code = $"sku_{i}",
-                    Description = $"sku_{i}_Description",
-                    Products = new(),
-                };
+        //if (!ctx.Skus.Any())
+        //{
+        //    Random rng = new Random();
+        //    for (int i = 0; i < 16; i++)
+        //    {
+        //        Sku s = new Sku
+        //        {
+        //            Name = $"sku_{i}",
+        //            Code = $"sku_{i}",
+        //            Description = $"sku_{i}_Description",
+        //            Products = new(),
+        //        };
 
-                for (int j = 0; j < 4; j++)
-                {
-                    Product p = new Product
-                    {
-                        Name = $"product_{i}_{j}",
-                        //Code = $"product_{i}_{j}",
-                        Code = rng.NextInt64(1L, 10000000000L).ToString().PadLeft(10).Replace(' ', '0'),
-                        Description = $"product_{i}_{j}_description",
-                        //Epc = $"{Guid.NewGuid():N}".ToUpperInvariant(),
-                        Epc = rng.Next(0, 2) == 0 ? $"{Guid.NewGuid():N}".ToUpperInvariant() : $"{Guid.NewGuid():N}".Substring(0, 24).ToUpperInvariant(),
-                        SerialNumber = Guid.NewGuid().ToString(),
-                        CreationTime = DateTime.Now,
-                    };
-                    s.Products.Add(p);
-                }
-                ctx.Skus.Add(s);
-            }
-            await ctx.SaveChangesAsync();
-        }
+        //        for (int j = 0; j < 4; j++)
+        //        {
+        //            Product p = new Product
+        //            {
+        //                Name = $"product_{i}_{j}",
+        //                //Code = $"product_{i}_{j}",
+        //                Code = rng.NextInt64(1L, 10000000000L).ToString().PadLeft(10).Replace(' ', '0'),
+        //                Description = $"product_{i}_{j}_description",
+        //                //Epc = $"{Guid.NewGuid():N}".ToUpperInvariant(),
+        //                Epc = rng.Next(0, 2) == 0 ? $"{Guid.NewGuid():N}".ToUpperInvariant() : $"{Guid.NewGuid():N}".Substring(0, 24).ToUpperInvariant(),
+        //                SerialNumber = Guid.NewGuid().ToString(),
+        //                CreationTime = DateTime.Now,
+        //            };
+        //            s.Products.Add(p);
+        //        }
+        //        ctx.Skus.Add(s);
+        //    }
+        //    await ctx.SaveChangesAsync();
+        //}
 
         if (!ctx.Printers.Any())
         {

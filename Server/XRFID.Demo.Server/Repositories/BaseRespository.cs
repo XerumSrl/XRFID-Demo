@@ -20,6 +20,11 @@ public class BaseRepository<T> where T : AuditEntity
     }
 
     #region Get
+    public virtual IQueryable<T> Query()
+    {
+        return _table.AsQueryable();
+    }
+
     public virtual async Task<List<T>> GetAsync(string? include = null)
     {
         if (include is not null)
