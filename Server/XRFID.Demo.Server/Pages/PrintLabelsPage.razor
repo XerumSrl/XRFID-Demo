@@ -9,58 +9,149 @@
 
 @inject PrinterRepository printerRepository;
 @inject LabelRepository labelRepository;
+@inject ProductRepository productRepository;
+@inject SkuRepository skuRepository;
 @inject ISnackbar snackbar;
 @inject IMapper mapper;
 @inject ILogger<PrintLabelsPage> _logger;
 
-<h1>PrintLabels</h1>
+<MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+    <MudTabPanel Text="Print Labels">
+        <h1>Print Labels</h1>
 
-<MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
-    <MudStack Class="my-3">
-        <MudSelect T="PrinterModel" Label="Printer" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Required="true" @bind-Value="selectedPrinter">
-            @foreach (var printer in printers)
-            {
-                <MudSelectItem Value="@printer">@printer.Name</MudSelectItem>
-            }
-        </MudSelect>
-        <MudSelect T="LabelModel" Label="Label" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Required="true" Value="@selectedLabel" ValueChanged="GetVariables">
-            @foreach (var label in labels)
-            {
-                <MudSelectItem Value="@label">@label.Name [Rev. @label.Version]</MudSelectItem>
-            }
-        </MudSelect>
+        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+            <MudStack Class="my-3">
+                <MudSelect T="PrinterModel" Label="Printer" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Required="true" @bind-Value="selectedPrinter">
+                    @foreach (var printer in printers)
+                    {
+                        <MudSelectItem Value="@printer">@printer.Name</MudSelectItem>
+                    }
+                </MudSelect>
+                <MudSelect T="LabelModel" Label="Label" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Required="true" Value="@selectedLabel" ValueChanged="GetVariables">
+                    @foreach (var label in labels)
+                    {
+                        <MudSelectItem Value="@label">@label.Name [Rev. @label.Version]</MudSelectItem>
+                    }
+                </MudSelect>
 
-        <MudNumericField T="int" Variant="Variant.Outlined" Label="Label Quantity" For="()=>labelQuantity" @bind-Value="labelQuantity" />
+                <MudNumericField T="int" Variant="Variant.Outlined" Label="Label Quantity" For="()=>labelQuantity" @bind-Value="labelQuantity" />
 
-        <MudTextField T="string" Label="Label Template" Value="@labelContent" ValueChanged="(x) => SetContent(x)" Lines="15" ReadOnly="false" Variant="Variant.Outlined" />
+                <MudTextField T="string" Label="Label Template" Value="@labelContent" ValueChanged="(x) => SetContent(x)" Lines="15" ReadOnly="false" Variant="Variant.Outlined" />
 
-        @if (variables.Any())
-        {
-            <MudCard Elevation="0" Outlined="true" >
-                <MudCardHeader>Variables</MudCardHeader>
-                <MudCardContent>
-                @foreach (var variable in variables)
+                @if (variables.Any())
                 {
-                    if (variable.Name.Equals("epc", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                            <MudTextField T="string" Variant="Variant.Outlined" Label="@variable.Name" @bind-Value="@variable.Value" Required="true" RequiredError="@("The " + variable.Name+ " Field is required")" Validation="@( new RegularExpressionAttribute(@"^([0-9a-fA-F]{32}|[0-9a-fA-F]{24})$"){ErrorMessage= "EPC must be a valix HEX rapresentation of 24 or 32 charachers"})" />
-                    }
-                    else
-                    {
-                            <MudTextField T="string" Variant="Variant.Outlined" Label="@variable.Name" @bind-Value="@variable.Value" />
-                    }
+                    <MudCard Elevation="0" Outlined="true">
+                        <MudCardHeader>Variables</MudCardHeader>
+                        <MudCardContent>
+                            @foreach (var variable in variables)
+                            {
+                                if (variable.Name.Equals("epc", StringComparison.InvariantCultureIgnoreCase))
+                                {
+                                    <MudTextField T="string" Variant="Variant.Outlined" Label="@variable.Name" @bind-Value="@variable.Value" Required="true" RequiredError="@("The " + variable.Name+ " Field is required")" Validation="@( new RegularExpressionAttribute(@"^([0-9a-fA-F]{32}|[0-9a-fA-F]{24})$"){ErrorMessage= "EPC must be a valix HEX rapresentation of 24 or 32 charachers"})" />
+                                }
+                                else
+                                {
+                                    <MudTextField T="string" Variant="Variant.Outlined" Label="@variable.Name" @bind-Value="@variable.Value" />
+                                }
 
+                            }
+                        </MudCardContent>
+                    </MudCard>
                 }
-                </MudCardContent>
-            </MudCard>
-        }
 
-        <MudStack Row="true" Class="my-6 d-flex justify-end">
-            <MudButton OnClick="@(async ()=> await Reset())" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Reset</MudButton>
-            <MudButton OnClick="@(async ()=> await Print())" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Print</MudButton>
-        </MudStack>
-    </MudStack>
-</MudForm>
+                <MudStack Row="true" Class="my-6 d-flex justify-end">
+                    <MudButton OnClick="@(async ()=> await Reset())" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Reset</MudButton>
+                    <MudButton OnClick="@(async ()=> await Print())" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Print</MudButton>
+                </MudStack>
+            </MudStack>
+        </MudForm>
+    </MudTabPanel>
+    <MudTabPanel Text="Print Product">
+        <h1>Print Product</h1>
+
+        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+            <MudStack Class="my-3">
+                <MudSelect T="PrinterModel" Label="Printer" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Required="true" @bind-Value="selectedPrinter">
+                    @foreach (var printer in printers)
+                    {
+                        <MudSelectItem Value="@printer">@printer.Name</MudSelectItem>
+                    }
+                </MudSelect>
+                <MudStack Class="my-3" Row="true">
+                    <MudSelect T="LabelModel" Label="Label" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Required="true" Value="@selectedLabel" ValueChanged="GetVariables">
+                        @foreach (var label in labels)
+                        {
+                            <MudSelectItem Value="@label">@label.Name [Rev. @label.Version]</MudSelectItem>
+                        }
+                    </MudSelect>
+
+                    <MudNumericField T="int" Variant="Variant.Outlined" Label="Label Quantity" For="()=>labelQuantity" @bind-Value="labelQuantity" />
+                </MudStack>
+
+
+                <MudTextField T="string" Label="Label Template" Value="@labelContent" ValueChanged="(x) => SetContent(x)" Lines="15" ReadOnly="false" Variant="Variant.Outlined" />
+
+                <MudSelect Label="Sku" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter"
+                @bind-Value="SelectedSku" Required="true" Validation="@(new Func<SkuModel, Task<string?>>(FillProducts))">
+                    @foreach (var sku in skus.OrderBy(q => q.Code))
+                    {
+                        <MudSelectItem Value="@sku">@sku.Code - @sku.Description</MudSelectItem>
+                    }
+                </MudSelect>
+
+                @if (SelectedSku is not null)
+                {
+                    @if (variables.Any())
+                    {
+                        <MudCard Elevation="0" Outlined="true">
+                            <MudCardHeader>Variables</MudCardHeader>
+                            <MudCardContent>
+                                @foreach (var variable in variables)
+                                {
+                                    if (variable.Name.Equals("epc", StringComparison.InvariantCultureIgnoreCase))
+                                    {
+                                        <MudTextField T="string" Variant="Variant.Outlined" Label="@variable.Name" @bind-Value="@variable.Value" Required="true" RequiredError="@("The " + variable.Name+ " Field is required")" Validation="@( new RegularExpressionAttribute(@"^([0-9a-fA-F]{32}|[0-9a-fA-F]{24})$"){ErrorMessage= "EPC must be a valix HEX rapresentation of 24 or 32 charachers"})" />
+                                    }
+                                    else
+                                    {
+                                        <MudTextField T="string" Variant="Variant.Outlined" Label="@variable.Name" @bind-Value="@variable.Value" />
+                                    }
+
+                                }
+                            </MudCardContent>
+                        </MudCard>
+                    }
+                    <MudDataGrid T="PrintProductModel" Items="@prods" ReadOnly="true" SortMode="SortMode.Single" Filterable="true" Striped="true"
+                                 MultiSelection="false" @bind-SelectedItems="@selectProd">
+                        <ToolBarContent>
+                            <MudText Typo="Typo.h6">Products</MudText>
+                            <MudSpacer />
+                        </ToolBarContent>
+                        <Columns>
+                            <SelectColumn T="PrintProductModel" />
+                            <PropertyColumn Property="x => x.Name" />
+                            <PropertyColumn Property="x => x.Barcode" InitialDirection="SortDirection.Ascending" />
+                            <PropertyColumn Property="x => x.Epc" />
+                            <PropertyColumn Property="x => x.Description" />
+                            <PropertyColumn Property="x => x.SerialNumber" />
+                            <PropertyColumn Property="x => x.CreationTime" Title="Date Creation" />
+                        </Columns>
+                        <PagerContent>
+                            <MudDataGridPager T="PrintProductModel" />
+                        </PagerContent>
+                    </MudDataGrid>
+                }
+
+                <MudStack Row="true" Class="my-6 d-flex justify-end">
+                    <MudButton OnClick="@(async ()=> await Reset())" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Reset</MudButton>
+                    <MudButton OnClick="@(async ()=> await Print())" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Print</MudButton>
+                </MudStack>
+            </MudStack>
+        </MudForm>
+    </MudTabPanel>
+</MudTabs>
+
+
 
 @code {
     bool success;
@@ -69,9 +160,11 @@
 
     private List<PrinterModel> printers = new List<PrinterModel>();
     private List<LabelModel> labels = new List<LabelModel>();
+    private List<SkuModel> skus = new List<SkuModel>();
 
     private PrinterModel? selectedPrinter;
     private LabelModel? selectedLabel;
+    private SkuModel? SelectedSku;
 
     private List<LabelVariable> variables = new List<LabelVariable>();
     private int labelQuantity = 1;
@@ -81,6 +174,7 @@
     {
         printers = mapper.Map<List<PrinterModel>>(await printerRepository.GetAsync());
         labels = mapper.Map<List<LabelModel>>(await labelRepository.GetAsync());
+        skus = mapper.Map<List<SkuModel>>(await skuRepository.GetAsync());
     }
 
     private async Task Print()
@@ -281,4 +375,76 @@
         labelQuantity = 1;
         labelContent = string.Empty;
     }
+
+    #region Print Product
+    private List<PrintProductModel> prods = new();
+
+    private string pBarcode = string.Empty;
+    private string pEpc = string.Empty;
+
+    HashSet<PrintProductModel> selectProdStorage { get; set; } = new();
+
+    HashSet<PrintProductModel> selectProd
+    {
+        get => selectProdStorage;
+        set
+        {
+            try
+            {
+                if (value is not null && value.Any() && selectProdStorage != value && value.First() is not null)
+                {
+                    var bcode = variables.Where(w => w.Name.ToLower() == "barcode").FirstOrDefault();
+                    if (bcode is not null)
+                    {
+                        bcode.Value = value.First().Barcode;
+                    }
+
+                    var epc = variables.Where(w => w.Name.ToLower() == "epc").FirstOrDefault();
+                    if (epc is not null)
+                    {
+                        epc.Value = value.First().Epc;
+                    }
+
+                    var descript = variables.Where(w => w.Name.ToLower() == "description").FirstOrDefault();
+                    if (descript is not null)
+                    {
+                        descript.Value = value.First().Description;
+                    }
+
+                    snackbar.Add($"{value.Count} \n {value.First().Barcode} \n {value.First().Epc}", Severity.Info);
+                    selectProdStorage = value;
+                }
+            }
+            catch (Exception)
+            {
+            }
+
+        }
+    }
+    PrintProductModel printProd = new();
+
+    private async Task<string?> FillProducts(SkuModel value)
+    {
+        try
+        {
+            prods = new();
+            var prod = productRepository.Query().Where(w => w.SkuId == value.Id).ToList();
+            prods = mapper.Map<List<PrintProductModel>>(prod);
+            if (prods is null || !prods.Any())
+            {
+                return null;
+            }
+
+            snackbar.Add($"{value.Name} Products Loaded", Severity.Success);
+
+            return null;
+        }
+        catch (Exception ex)
+        {
+            snackbar.Add($"PRODUCTS LOADING FAILED!!\nError: {ex.Message}", Severity.Error);
+            return null;
+        }
+
+    }
+    #endregion
 }

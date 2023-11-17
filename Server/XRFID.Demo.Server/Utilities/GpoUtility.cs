@@ -46,7 +46,7 @@ public class GpoUtility
 public class GpoConfiguration
 {
     public int GreenLed { get; set; } = 1;
-    public int YellowLed { get; set; } = 2;
-    public int RedLed { get; set; } = 3;
+    public int YellowLed { get; set; } = 3;
+    public int RedLed { get; set; } = 2;
     public int Buzzer { get; set; } = 4;
 }

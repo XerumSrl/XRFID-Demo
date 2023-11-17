@@ -41,6 +41,8 @@
     private string skuName = "Sku Not found";
     private bool isDisabled = false;
 
+    Sku? sku;
+
     protected override async Task OnInitializedAsync()
     {
         product = await productRepository.GetAsync(Id, "Sku");
@@ -51,7 +53,7 @@
             return;
         }
 
-        Sku? sku = await skuRepository.GetAsync(product.SkuId);
+        sku = await skuRepository.GetAsync(product.SkuId);
 
         if (sku is null)
         {
@@ -83,27 +85,29 @@
             return;
         }
 
-        // if (!(await IsEpcUniqueAsync(model.Epc)))
-        // {
-        //     snackbar.Add($"Epc {model.Epc} already in use.", MudBlazor.Severity.Error);
-        //     return;
-        // }
+        try
+        {
+            Product result = await productRepository.UpdateAsync(new Product
+                {
+                    Id = product.Id,
+                    Name = model.Name,
+                    Description = model.Description,
+                    Code = model.Code,
+                    Note = model.Note,
+                    Epc = model.Epc,
+                    ContentQuantity = model.ContentQuantity,
+                    SerialNumber = model.SerialNumber,
+                    SkuId = product.SkuId,
+                    Sku = sku ?? throw new Exception("Sku is null"),
+                });
+            await uow.SaveAsync();
+        }
+        catch (Exception ex)
+        {
+            snackbar.Add($"{ex.Message}   Product {model.Name} updating failed.", MudBlazor.Severity.Error);
+            return;
+        }
 
-        Product result = await productRepository.UpdateAsync(new Product
-            {
-                Id = product.Id,
-                Name = model.Name,
-                Description = model.Description,
-                Code = model.Code,
-                Note = model.Note,
-                Epc = model.Epc,
-                ContentQuantity = model.ContentQuantity,
-                SerialNumber = model.SerialNumber,
-                SkuId = product.SkuId,
-
-            });
-        await uow.SaveAsync();
-        //fare comparire un popup che inserimento ok e rimanare alla pagina
 
         snackbar.Add($"Product {model.Name} updated.", MudBlazor.Severity.Success);
 

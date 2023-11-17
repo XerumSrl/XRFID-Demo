@@ -52,10 +52,9 @@ else
                     <MudSelectItem Value="@sku">@sku.Code - @sku.Description</MudSelectItem>
                 }
             </MudSelect>
-            <MudTextField T="string" Label="Code Prefix" @bind-Value="multiModel.CodePrefix" For="()=>multiModel.CodePrefix" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true"
-                          Validation="@(new Func<string, Task<string?>>(ValidateCodePrefix))" AutoFocus="true" />
+            <MudTextField T="int" Label="Initial Code" @bind-Value="multiModel.InitialCode" For="()=>multiModel.InitialCode" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true"
+                          Validation="@(new Func<int, Task<int?>>(ValidateCodePrefix))" AutoFocus="true" />
             <MudTextField T="string" Label="Epc Prefix" @bind-Value="multiModel.EpcPrefix" For="()=>multiModel.EpcPrefix" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" />
-            <MudNumericField Label="First Product #" @bind-Value="multiModel.StartIncremental" For="()=>multiModel.StartIncremental" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" />
             <MudNumericField Label="Product #" @bind-Value="multiModel.NProd" For="()=>multiModel.NProd" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" />
 
             <MudStack Row="true" Class="my-6 d-flex justify-end">
@@ -174,20 +173,24 @@ else
 
         for (int i = 0; i < multiModel.NProd; i++)
         {
-            string n = (multiModel.StartIncremental + i).ToString().PadLeft(8).Replace(' ', '0');
-            string code = $"{multiModel.CodePrefix}{n}";
+            // string n = (multiModel.StartIncremental + i).ToString().PadLeft(8).Replace(' ', '0');
+            // string code = $"{multiModel.InitialCode}{n}";
 
-            string epc = $"{multiModel.EpcPrefix}{DateTime.Now.ToString("yyyyMMdd")}{code}";
+            string code = $"{multiModel.InitialCode + i}";
+            string epcCode = code.PadLeft(12).Replace(' ', '0');
+
+
+            string epc = $"{multiModel.EpcPrefix}{DateTime.Now.ToString("yyyyMMdd")}{epcCode}";
 
             prods.Add(new Product
                 {
                     Name = code,
                     Code = code,
                     Reference = code,
-                    Description = $"Procedurally generated product {n}",
+                    Description = $"Procedurally generated product {code}",
                     Epc = epc,
                     ContentQuantity = 1,
-                    SerialNumber = n,
+                    SerialNumber = code,
                     SkuId = multiModel.SkuId,
                     Sku = sku,
 
@@ -211,28 +214,29 @@ else
             return;
         }
 
-        snackbar.Add($"Products from {multiModel.StartIncremental} to {multiModel.StartIncremental + multiModel.NProd} created ({multiModel.NProd})", Severity.Success);
+        snackbar.Add($"Products from {multiModel.InitialCode} to {multiModel.InitialCode + multiModel.NProd} created ({multiModel.NProd})", Severity.Success);
     }
 
-    private async Task<string?> ValidateCodePrefix(string value)
+    private async Task<int?> ValidateCodePrefix(int value)
     {
-        Product? lastIncrementalProduct = productRepository.Query().Where(w => w.Code.Substring(0, 4).ToUpper() == value).OrderBy(o => o.Code).LastOrDefault();
-        if (lastIncrementalProduct is null)
-        {
-            multiModel.StartIncremental = 0;
-            return null;
-        }
-
         try
         {
-            multiModel.StartIncremental = int.Parse(lastIncrementalProduct.Code.Substring(4))+1;
-        }
-        catch (Exception)
-        {
-            multiModel.StartIncremental = 0;
+            Product? lastIncrementalProduct = productRepository.Query().Where(w => w.Code == value.ToString()).FirstOrDefault();
+            if (lastIncrementalProduct is null)
+            {
+                return null;
+            }
+
+            snackbar.Add($"Product {value} already exists", Severity.Error);
+
             return null;
         }
-        return null;
+        catch (Exception ex)
+        {
+            snackbar.Add($"CREATION FAILED!!\nError: {ex.Message}", Severity.Error);
+            return null;
+        }
+        
     }
     #endregion
 
