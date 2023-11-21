@@ -24,6 +24,7 @@ namespace XRFID.Demo.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Code")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Content")
@@ -53,9 +54,11 @@ namespace XRFID.Demo.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Reference")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Version")
@@ -73,6 +76,7 @@ namespace XRFID.Demo.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Code")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreationTime")
@@ -101,6 +105,7 @@ namespace XRFID.Demo.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<Guid?>("OrderId")
@@ -113,6 +118,7 @@ namespace XRFID.Demo.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Reference")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Sequence")
@@ -122,6 +128,8 @@ namespace XRFID.Demo.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ReaderId");
 
                     b.ToTable("LoadingUnits");
                 });
@@ -133,6 +141,7 @@ namespace XRFID.Demo.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Code")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreationTime")
@@ -166,9 +175,11 @@ namespace XRFID.Demo.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Reference")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SerialNumber")
@@ -191,6 +202,7 @@ namespace XRFID.Demo.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Code")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreationTime")
@@ -225,6 +237,7 @@ namespace XRFID.Demo.Server.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<Guid?>("OrderId")
@@ -240,6 +253,7 @@ namespace XRFID.Demo.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Reference")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Sequence")
@@ -252,6 +266,8 @@ namespace XRFID.Demo.Server.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ReaderId");
 
                     b.ToTable("Movements");
                 });
@@ -266,6 +282,7 @@ namespace XRFID.Demo.Server.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Code")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreationTime")
@@ -310,6 +327,7 @@ namespace XRFID.Demo.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("PC")
@@ -322,6 +340,7 @@ namespace XRFID.Demo.Server.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Reference")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<short>("Rssi")
@@ -355,6 +374,7 @@ namespace XRFID.Demo.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Code")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreationTime")
@@ -392,12 +412,14 @@ namespace XRFID.Demo.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Port")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Reference")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SerialNumber")
@@ -458,6 +480,7 @@ namespace XRFID.Demo.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Reference")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SerialNumber")
@@ -469,11 +492,14 @@ namespace XRFID.Demo.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("Code");
+                    b.HasIndex("Code")
+                        .IsUnique();
 
-                    b.HasAlternateKey("Epc");
+                    b.HasIndex("Epc")
+                        .IsUnique();
 
-                    b.HasAlternateKey("Name");
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.HasIndex("SkuId");
 
@@ -490,6 +516,7 @@ namespace XRFID.Demo.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Code")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("CorrelationId")
@@ -521,12 +548,14 @@ namespace XRFID.Demo.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ReaderOS")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Reference")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SerialNumber")
@@ -583,15 +612,29 @@ namespace XRFID.Demo.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Reference")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("Code");
+                    b.HasIndex("Code")
+                        .IsUnique();
 
-                    b.HasAlternateKey("Name");
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Skus");
+                });
+
+            modelBuilder.Entity("XRFID.Demo.Server.Entities.LoadingUnit", b =>
+                {
+                    b.HasOne("XRFID.Demo.Server.Entities.Reader", "Reader")
+                        .WithMany("LoadingUnits")
+                        .HasForeignKey("ReaderId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Reader");
                 });
 
             modelBuilder.Entity("XRFID.Demo.Server.Entities.LoadingUnitItem", b =>
@@ -599,10 +642,21 @@ namespace XRFID.Demo.Server.Migrations
                     b.HasOne("XRFID.Demo.Server.Entities.LoadingUnit", "LoadingUnit")
                         .WithMany("LoadingUnitItems")
                         .HasForeignKey("LoadingUnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("LoadingUnit");
+                });
+
+            modelBuilder.Entity("XRFID.Demo.Server.Entities.Movement", b =>
+                {
+                    b.HasOne("XRFID.Demo.Server.Entities.Reader", "Reader")
+                        .WithMany("Movements")
+                        .HasForeignKey("ReaderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Reader");
                 });
 
             modelBuilder.Entity("XRFID.Demo.Server.Entities.MovementItem", b =>
@@ -647,6 +701,13 @@ namespace XRFID.Demo.Server.Migrations
             modelBuilder.Entity("XRFID.Demo.Server.Entities.Movement", b =>
                 {
                     b.Navigation("MovementItems");
+                });
+
+            modelBuilder.Entity("XRFID.Demo.Server.Entities.Reader", b =>
+                {
+                    b.Navigation("LoadingUnits");
+
+                    b.Navigation("Movements");
                 });
 
             modelBuilder.Entity("XRFID.Demo.Server.Entities.Sku", b =>

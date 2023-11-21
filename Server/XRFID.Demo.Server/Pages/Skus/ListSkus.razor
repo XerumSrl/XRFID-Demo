@@ -49,7 +49,8 @@
             </MudCardHeader>
             <MudCardContent>
                 <MudDataGrid Items="@context.Item.Products"
-                             ReadOnly="true">
+                             ReadOnly="true"
+                             Filterable="true">
                     <Columns>
                         <PropertyColumn Property="x => x.Name" />
                         <PropertyColumn Property="x => x.Code" />

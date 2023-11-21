@@ -1,4 +1,4 @@
-﻿@page "/Products/Add"
+﻿@page "/Products/Add/{mpmode:bool?}"
 @using System.Text.RegularExpressions;
 @using System.ComponentModel.DataAnnotations;
 @using XRFID.Demo.Server.Database;
@@ -69,7 +69,13 @@ else
 
 
 @code {
-    bool _multipleMode = false;
+    [Parameter]
+    public bool? mpmode
+    {
+        get => _multipleMode;
+        set => _multipleMode = value ?? false;
+    }
+    bool _multipleMode { get; set; }
 
     bool success;
     string[] errors = { };
@@ -167,9 +173,8 @@ else
             return;
         }
 
-
-
-        List<Product> prods = new List<Product>(multiModel.NProd);
+        // List<Product> prods = new List<Product>(multiModel.NProd);
+        List<Product> prods = new ();
 
         for (int i = 0; i < multiModel.NProd; i++)
         {
@@ -191,7 +196,7 @@ else
                     Epc = epc,
                     ContentQuantity = 1,
                     SerialNumber = code,
-                    SkuId = multiModel.SkuId,
+                    SkuId = sku.Id,
                     Sku = sku,
 
                     CreatorUserId = "AddPRoductPage",
@@ -200,9 +205,12 @@ else
         }
 
         try
-        {
+        {           
             _ = await productRepository.CreateAsync(prods);
             int save = await uow.SaveAsync();
+
+            uow.Clear();
+
             if (save != multiModel.NProd)
             {
                 throw new Exception($"Not all products have been added ({save}/{multiModel.NProd})");
@@ -211,10 +219,16 @@ else
         catch (Exception ex)
         {
             snackbar.Add($"CREATION FAILED!!\nError: {ex.Message}", Severity.Error);
+            Navigation.NavigateTo(Navigation.Uri);
+
             return;
         }
 
-        snackbar.Add($"Products from {multiModel.InitialCode} to {multiModel.InitialCode + multiModel.NProd} created ({multiModel.NProd})", Severity.Success);
+        snackbar.Add($"Products from {multiModel.InitialCode} to {multiModel.InitialCode + multiModel.NProd -1} created ({multiModel.NProd})", Severity.Success, config =>
+        {
+            config.VisibleStateDuration = 10000;
+        });
+        Navigation.NavigateTo("/Products", false);
     }
 
     private async Task<int?> ValidateCodePrefix(int value)

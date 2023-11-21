@@ -23,6 +23,7 @@ public class Movement : AuditEntity
     public bool IsConsolidated { get; set; }
 
     public Guid ReaderId { get; set; }
+    public Reader Reader { get; set; }
 
     public List<MovementItem> MovementItems { get; set; } = new List<MovementItem>();
 

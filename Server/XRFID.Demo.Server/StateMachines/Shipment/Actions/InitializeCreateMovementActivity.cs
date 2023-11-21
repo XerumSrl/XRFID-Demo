@@ -70,7 +70,8 @@ internal class InitializeCreateMovementActivity :
                 Id = Guid.NewGuid(),
                 Description = $"Shipment {DateTime.Now}",
                 Name = $"{reader.Name}_{DateTime.Now}",
-                ReaderId = context.Message.ReaderId,
+                ReaderId = context.Saga.ReaderId,
+                Reader = reader,
                 IsActive = true,
                 IsConsolidated = false,
             });

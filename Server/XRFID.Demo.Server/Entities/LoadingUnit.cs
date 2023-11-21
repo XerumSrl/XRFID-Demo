@@ -15,6 +15,7 @@ public class LoadingUnit : AuditEntity
     public bool IsConsolidated { get; set; }
 
     public Guid ReaderId { get; set; }
+    public required Reader Reader { get; set; }
 
     public Guid? OrderId { get; set; }
 

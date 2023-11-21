@@ -21,9 +21,9 @@ namespace XRFID.Demo.Server.Migrations
                     Content = table.Column<string>(type: "TEXT", nullable: false),
                     Language = table.Column<int>(type: "INTEGER", nullable: false),
                     IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: true),
-                    Code = table.Column<string>(type: "TEXT", nullable: true),
-                    Reference = table.Column<string>(type: "TEXT", nullable: true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Code = table.Column<string>(type: "TEXT", nullable: false),
+                    Reference = table.Column<string>(type: "TEXT", nullable: false),
                     CreatorUserId = table.Column<string>(type: "TEXT", nullable: true),
                     CreationTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     LastModifierUserId = table.Column<string>(type: "TEXT", nullable: true),
@@ -32,64 +32,6 @@ namespace XRFID.Demo.Server.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Labels", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "LoadingUnits",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Sequence = table.Column<int>(type: "INTEGER", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
-                    Timestamp = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
-                    IsValid = table.Column<bool>(type: "INTEGER", nullable: false),
-                    IsConsolidated = table.Column<bool>(type: "INTEGER", nullable: false),
-                    ReaderId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    OrderId = table.Column<Guid>(type: "TEXT", nullable: true),
-                    OrderReference = table.Column<string>(type: "TEXT", nullable: true),
-                    Name = table.Column<string>(type: "TEXT", nullable: true),
-                    Code = table.Column<string>(type: "TEXT", nullable: true),
-                    Reference = table.Column<string>(type: "TEXT", nullable: true),
-                    CreatorUserId = table.Column<string>(type: "TEXT", nullable: true),
-                    CreationTime = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    LastModifierUserId = table.Column<string>(type: "TEXT", nullable: true),
-                    LastModificationTime = table.Column<DateTime>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LoadingUnits", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Movements",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Sequence = table.Column<int>(type: "INTEGER", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
-                    Timestamp = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    IsValid = table.Column<bool>(type: "INTEGER", nullable: false),
-                    UnexpectedItem = table.Column<bool>(type: "INTEGER", nullable: false),
-                    MissingItem = table.Column<bool>(type: "INTEGER", nullable: false),
-                    OverflowItem = table.Column<bool>(type: "INTEGER", nullable: false),
-                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
-                    IsConsolidated = table.Column<bool>(type: "INTEGER", nullable: false),
-                    ReaderId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    OrderId = table.Column<Guid>(type: "TEXT", nullable: true),
-                    OrderReference = table.Column<string>(type: "TEXT", nullable: true),
-                    Direction = table.Column<int>(type: "INTEGER", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: true),
-                    Code = table.Column<string>(type: "TEXT", nullable: true),
-                    Reference = table.Column<string>(type: "TEXT", nullable: true),
-                    CreatorUserId = table.Column<string>(type: "TEXT", nullable: true),
-                    CreationTime = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    LastModifierUserId = table.Column<string>(type: "TEXT", nullable: true),
-                    LastModificationTime = table.Column<DateTime>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Movements", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -109,9 +51,9 @@ namespace XRFID.Demo.Server.Migrations
                     Language = table.Column<int>(type: "INTEGER", nullable: true),
                     Status = table.Column<int>(type: "INTEGER", nullable: false),
                     WorkflowType = table.Column<int>(type: "INTEGER", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: true),
-                    Code = table.Column<string>(type: "TEXT", nullable: true),
-                    Reference = table.Column<string>(type: "TEXT", nullable: true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Code = table.Column<string>(type: "TEXT", nullable: false),
+                    Reference = table.Column<string>(type: "TEXT", nullable: false),
                     CreatorUserId = table.Column<string>(type: "TEXT", nullable: true),
                     CreationTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     LastModifierUserId = table.Column<string>(type: "TEXT", nullable: true),
@@ -138,9 +80,9 @@ namespace XRFID.Demo.Server.Migrations
                     Version = table.Column<string>(type: "TEXT", nullable: true),
                     SerialNumber = table.Column<string>(type: "TEXT", nullable: true),
                     ReaderOS = table.Column<string>(type: "TEXT", nullable: true),
-                    Name = table.Column<string>(type: "TEXT", nullable: true),
-                    Code = table.Column<string>(type: "TEXT", nullable: true),
-                    Reference = table.Column<string>(type: "TEXT", nullable: true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Code = table.Column<string>(type: "TEXT", nullable: false),
+                    Reference = table.Column<string>(type: "TEXT", nullable: false),
                     CreatorUserId = table.Column<string>(type: "TEXT", nullable: true),
                     CreationTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     LastModifierUserId = table.Column<string>(type: "TEXT", nullable: true),
@@ -161,7 +103,7 @@ namespace XRFID.Demo.Server.Migrations
                     EffectivityEnd = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Code = table.Column<string>(type: "TEXT", nullable: false),
-                    Reference = table.Column<string>(type: "TEXT", nullable: true),
+                    Reference = table.Column<string>(type: "TEXT", nullable: false),
                     CreatorUserId = table.Column<string>(type: "TEXT", nullable: true),
                     CreationTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     LastModifierUserId = table.Column<string>(type: "TEXT", nullable: true),
@@ -170,25 +112,25 @@ namespace XRFID.Demo.Server.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Skus", x => x.Id);
-                    table.UniqueConstraint("AK_Skus_Code", x => x.Code);
-                    table.UniqueConstraint("AK_Skus_Name", x => x.Name);
                 });
 
             migrationBuilder.CreateTable(
-                name: "LoadingUnitItems",
+                name: "LoadingUnits",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Sequence = table.Column<int>(type: "INTEGER", nullable: false),
                     Description = table.Column<string>(type: "TEXT", nullable: false),
-                    SerialNumber = table.Column<string>(type: "TEXT", nullable: true),
-                    Epc = table.Column<string>(type: "TEXT", nullable: false),
+                    Timestamp = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsValid = table.Column<bool>(type: "INTEGER", nullable: false),
                     IsConsolidated = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Status = table.Column<int>(type: "INTEGER", nullable: false),
-                    LoadingUnitId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    LoadingUnitReference = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: true),
-                    Code = table.Column<string>(type: "TEXT", nullable: true),
-                    Reference = table.Column<string>(type: "TEXT", nullable: true),
+                    ReaderId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    OrderId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    OrderReference = table.Column<string>(type: "TEXT", nullable: true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Code = table.Column<string>(type: "TEXT", nullable: false),
+                    Reference = table.Column<string>(type: "TEXT", nullable: false),
                     CreatorUserId = table.Column<string>(type: "TEXT", nullable: true),
                     CreationTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     LastModifierUserId = table.Column<string>(type: "TEXT", nullable: true),
@@ -196,11 +138,47 @@ namespace XRFID.Demo.Server.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_LoadingUnitItems", x => x.Id);
+                    table.PrimaryKey("PK_LoadingUnits", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_LoadingUnitItems_LoadingUnits_LoadingUnitId",
-                        column: x => x.LoadingUnitId,
-                        principalTable: "LoadingUnits",
+                        name: "FK_LoadingUnits_Readers_ReaderId",
+                        column: x => x.ReaderId,
+                        principalTable: "Readers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Movements",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Sequence = table.Column<int>(type: "INTEGER", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    Timestamp = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    IsValid = table.Column<bool>(type: "INTEGER", nullable: false),
+                    UnexpectedItem = table.Column<bool>(type: "INTEGER", nullable: false),
+                    MissingItem = table.Column<bool>(type: "INTEGER", nullable: false),
+                    OverflowItem = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsConsolidated = table.Column<bool>(type: "INTEGER", nullable: false),
+                    ReaderId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    OrderId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    OrderReference = table.Column<string>(type: "TEXT", nullable: true),
+                    Direction = table.Column<int>(type: "INTEGER", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Code = table.Column<string>(type: "TEXT", nullable: false),
+                    Reference = table.Column<string>(type: "TEXT", nullable: false),
+                    CreatorUserId = table.Column<string>(type: "TEXT", nullable: true),
+                    CreationTime = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    LastModifierUserId = table.Column<string>(type: "TEXT", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Movements", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Movements_Readers_ReaderId",
+                        column: x => x.ReaderId,
+                        principalTable: "Readers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -218,7 +196,7 @@ namespace XRFID.Demo.Server.Migrations
                     SkuId = table.Column<Guid>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Code = table.Column<string>(type: "TEXT", nullable: false),
-                    Reference = table.Column<string>(type: "TEXT", nullable: true),
+                    Reference = table.Column<string>(type: "TEXT", nullable: false),
                     CreatorUserId = table.Column<string>(type: "TEXT", nullable: true),
                     CreationTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     LastModifierUserId = table.Column<string>(type: "TEXT", nullable: true),
@@ -227,15 +205,42 @@ namespace XRFID.Demo.Server.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Products", x => x.Id);
-                    table.UniqueConstraint("AK_Products_Code", x => x.Code);
-                    table.UniqueConstraint("AK_Products_Epc", x => x.Epc);
-                    table.UniqueConstraint("AK_Products_Name", x => x.Name);
                     table.ForeignKey(
                         name: "FK_Products_Skus_SkuId",
                         column: x => x.SkuId,
                         principalTable: "Skus",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LoadingUnitItems",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    SerialNumber = table.Column<string>(type: "TEXT", nullable: true),
+                    Epc = table.Column<string>(type: "TEXT", nullable: false),
+                    IsConsolidated = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
+                    LoadingUnitId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    LoadingUnitReference = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Code = table.Column<string>(type: "TEXT", nullable: false),
+                    Reference = table.Column<string>(type: "TEXT", nullable: false),
+                    CreatorUserId = table.Column<string>(type: "TEXT", nullable: true),
+                    CreationTime = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    LastModifierUserId = table.Column<string>(type: "TEXT", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LoadingUnitItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LoadingUnitItems_LoadingUnits_LoadingUnitId",
+                        column: x => x.LoadingUnitId,
+                        principalTable: "LoadingUnits",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -260,9 +265,9 @@ namespace XRFID.Demo.Server.Migrations
                     MovementId = table.Column<Guid>(type: "TEXT", nullable: false),
                     ProductId = table.Column<Guid>(type: "TEXT", nullable: true),
                     LoadingUnitItemId = table.Column<Guid>(type: "TEXT", nullable: true),
-                    Name = table.Column<string>(type: "TEXT", nullable: true),
-                    Code = table.Column<string>(type: "TEXT", nullable: true),
-                    Reference = table.Column<string>(type: "TEXT", nullable: true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Code = table.Column<string>(type: "TEXT", nullable: false),
+                    Reference = table.Column<string>(type: "TEXT", nullable: false),
                     CreatorUserId = table.Column<string>(type: "TEXT", nullable: true),
                     CreationTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     LastModifierUserId = table.Column<string>(type: "TEXT", nullable: true),
@@ -295,6 +300,11 @@ namespace XRFID.Demo.Server.Migrations
                 column: "LoadingUnitId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_LoadingUnits_ReaderId",
+                table: "LoadingUnits",
+                column: "ReaderId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_MovementItems_LoadingUnitItemId",
                 table: "MovementItems",
                 column: "LoadingUnitItemId");
@@ -310,9 +320,44 @@ namespace XRFID.Demo.Server.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Movements_ReaderId",
+                table: "Movements",
+                column: "ReaderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_Code",
+                table: "Products",
+                column: "Code",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_Epc",
+                table: "Products",
+                column: "Epc",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_Name",
+                table: "Products",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Products_SkuId",
                 table: "Products",
                 column: "SkuId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Skus_Code",
+                table: "Skus",
+                column: "Code",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Skus_Name",
+                table: "Skus",
+                column: "Name",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -328,9 +373,6 @@ namespace XRFID.Demo.Server.Migrations
                 name: "Printers");
 
             migrationBuilder.DropTable(
-                name: "Readers");
-
-            migrationBuilder.DropTable(
                 name: "LoadingUnitItems");
 
             migrationBuilder.DropTable(
@@ -344,6 +386,9 @@ namespace XRFID.Demo.Server.Migrations
 
             migrationBuilder.DropTable(
                 name: "Skus");
+
+            migrationBuilder.DropTable(
+                name: "Readers");
         }
     }
 }

@@ -25,4 +25,7 @@ public class Reader : AuditEntity
     public string? SerialNumber { get; set; }
 
     public string? ReaderOS { get; set; }
+
+    public List<LoadingUnit>? LoadingUnits { get; set; }
+    public List<Movement>? Movements { get; set; }
 }

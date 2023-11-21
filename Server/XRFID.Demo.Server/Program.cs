@@ -103,15 +103,15 @@ try
     #region RepositorySetup
     builder.Services.AddScoped<UnitOfWork>();
 
-    builder.Services.AddScoped<ProductRepository>();
-    builder.Services.AddScoped<SkuRepository>();
-    builder.Services.AddScoped<LoadingUnitRepository>();
-    builder.Services.AddScoped<LoadingUnitItemRepository>();
-    builder.Services.AddScoped<MovementRepository>();
-    builder.Services.AddScoped<MovementItemRepository>();
-    builder.Services.AddScoped<ReaderRepository>();
-    builder.Services.AddScoped<LabelRepository>();
-    builder.Services.AddScoped<PrinterRepository>();
+    builder.Services.AddTransient<ProductRepository>();
+    builder.Services.AddTransient<SkuRepository>();
+    builder.Services.AddTransient<LoadingUnitRepository>();
+    builder.Services.AddTransient<LoadingUnitItemRepository>();
+    builder.Services.AddTransient<MovementRepository>();
+    builder.Services.AddTransient<MovementItemRepository>();
+    builder.Services.AddTransient<ReaderRepository>();
+    builder.Services.AddTransient<LabelRepository>();
+    builder.Services.AddTransient<PrinterRepository>();
     #endregion
 
     #region SwaggerSetup

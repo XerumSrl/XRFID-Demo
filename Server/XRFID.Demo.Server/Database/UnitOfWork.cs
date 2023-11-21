@@ -21,6 +21,11 @@ public class UnitOfWork : IDisposable
         return await _context.SaveChangesAsync();
     }
 
+    public void Clear()
+    {
+        _context.ChangeTracker.Clear();
+    }
+
     private void Dispose(bool disposing)
     {
         if (!isDisposed && disposing)
