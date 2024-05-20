@@ -231,7 +231,7 @@
                 {
                     foreach (var variable in variables)
                     {
-                        string oldValue = "{" + variable.Name + "}";
+                        string oldValue = "%" + variable.Name + "%";
                         string newValue = variable.Value ?? "";
                         label = label.Replace(oldValue, newValue);
                     }
@@ -274,13 +274,13 @@
         int startIndex = 0;
         do
         {
-            int openIndex = selectedLabel.Content.IndexOf("{", startIndex + 1);
+            int openIndex = selectedLabel.Content.IndexOf("%", startIndex + 1);
             if (openIndex == -1)
             {
                 break;
             }
 
-            int closeIndex = selectedLabel.Content.IndexOf("}", openIndex + 1);
+            int closeIndex = selectedLabel.Content.IndexOf("%", openIndex + 1);
 
             if (closeIndex == -1 || openIndex + 1 == closeIndex)
             {
