@@ -130,7 +130,7 @@ internal class InitializeCreateMovementActivity :
                             Code = loadingUnitItem.Code,
                             Reference = loadingUnitItem.Reference,
 
-                            Description = loadingUnitItem.Epc,
+                            Description = loadingUnitItem.Description ?? loadingUnitItem.Epc,
                             SerialNumber = loadingUnitItem.SerialNumber ?? String.Empty,
                             Epc = loadingUnitItem.Epc,
 
