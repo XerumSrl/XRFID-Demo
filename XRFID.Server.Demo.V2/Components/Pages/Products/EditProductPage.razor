@@ -1,0 +1,139 @@
+﻿@page "/Products/Edit/{Id:guid}"
+@using System.Text.RegularExpressions;
+@using System.ComponentModel.DataAnnotations;
+@using XRFID.Server.Demo.V2.Entities
+@using XRFID.Server.Demo.V2.Repositories.Interfaces
+@using XRFID.Server.Demo.V2.ViewModels
+@using Xerum.XFramework.DBAccess.Uow
+@inject NavigationManager Navigation;
+@inject ISkuRepository skuRepository;
+@inject IProductRepository productRepository;
+@inject IUnitOfWork uow;
+@inject ISnackbar snackbar;
+
+<h1>Edit Product @model.Name?</h1>
+
+<MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Disabled="@isDisabled">
+    <MudStack Class="my-3">
+        <MudTextField T="string" Variant="Variant.Outlined" Label="Sku" @bind-Value="skuName" ReadOnly=true />
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Name" For="()=>model.Name" @bind-Value="model.Name" AutoFocus="true" />
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Reference" For="()=>model.Reference" @bind-Value="model.Reference" />
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Description" For="()=>model.Description" @bind-Value="model.Description" />
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="EPC" For="()=>model.Epc" @bind-Value="model.Epc" HelperText="24 or 32 characther HEX string" />
+        <MudTextField T="string" Variant="Variant.Outlined" Required="true" OnlyValidateIfDirty="true" Label="Serial Number" For="()=>model.SerialNumber" @bind-Value="model.SerialNumber" />
+
+        <MudStack Row="true" Class="my-6 d-flex justify-end">
+            <MudButton OnClick="@(()=> Back())" Variant="Variant.Outlined" Color="Color.Default" Class="ml-3">Back</MudButton>
+            <MudButton OnClick="@(async ()=> await Submit())" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-3">Submit</MudButton>
+        </MudStack>
+    </MudStack>
+</MudForm>
+
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+    bool success;
+    string[] errors = { };
+    MudForm form;
+    private Product? product;
+    private ProductModel model;
+    private string skuName = "Sku Not found";
+    private bool isDisabled = false;
+
+    Sku? sku;
+
+    protected override async Task OnInitializedAsync()
+    {
+        product = await productRepository.GetAsync(Id, "Sku");
+        isDisabled = product == null;
+
+        if (product is null)
+        {
+            return;
+        }
+
+        sku = await skuRepository.GetAsync(product.SkuId ?? Guid.Empty);
+
+        if (sku is null)
+        {
+            return;
+        }
+
+        skuName = sku.Name;
+
+        model = new ProductModel
+            {
+                Name = product.Name ?? string.Empty,
+                Description = product.Description,
+                Epc = product.Epc,
+                ContentQuantity = product.ContentQuantity,
+                SerialNumber = product.SerialNumber,
+                Note = product.Note,
+                SkuId = product.SkuId ?? Guid.Empty,
+                SkuReference = sku.Reference
+                
+                
+            };
+
+    }
+
+    private async Task Submit()
+    {
+        await form.Validate();
+
+        if (product is null || !form.IsValid)
+        {
+            return;
+        }
+
+        try
+        {
+            Product p = new Product
+                {
+                    Id = product.Id,
+                    Name = model.Name,
+                    Description = model.Description,
+                    Reference = model.Reference,
+                    Note = model.Note,
+                    Epc = model.Epc,
+                    ContentQuantity = model.ContentQuantity,
+                    SerialNumber = model.SerialNumber,
+                    SkuId = product.SkuId,
+                    Sku = sku ?? throw new Exception("Sku is null"),
+                    SkuReference = model.SkuReference
+                };
+
+            await productRepository.ExecuteUpdateAsync(l => l.Id == product.Id,
+            e => e.SetProperty(p => p.Name, model.Name)
+                  .SetProperty(p => p.Description, model.Description)
+                  .SetProperty(p => p.Reference, model.Reference)
+                  .SetProperty(p => p.Epc, model.Epc)
+                  .SetProperty(p => p.SerialNumber, model.SerialNumber));
+
+        }
+        catch (Exception ex)
+        {
+            snackbar.Add($"{ex.Message}   Product {model.Name} updating failed.", MudBlazor.Severity.Error);
+            return;
+        }
+
+
+        snackbar.Add($"Product {model.Name} updated.", MudBlazor.Severity.Success);
+
+        Navigation.NavigateTo($"Products");
+
+        StateHasChanged();
+    }
+
+    private void Back()
+    {
+        Navigation.NavigateTo($"Products");
+    }
+
+    private async Task<bool> IsEpcUniqueAsync(string epc)
+    {
+        return !(await productRepository.GetAsync(q => q.Epc == epc)).Any();
+    }
+
+}

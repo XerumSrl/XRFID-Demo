@@ -1,0 +1,180 @@
+﻿@page "/Locationing/{reader}/{epc}"
+@implements IDisposable
+@using Microsoft.EntityFrameworkCore
+@using Syncfusion.Blazor
+@using Syncfusion.Blazor.Charts
+@using System.Collections.ObjectModel
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.HeatMap
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Grids
+@using System.Diagnostics
+@using XRFID.Server.Demo.V2.DataStructures.SignalR
+@using XRFID.Server.Demo.V2.Entities
+@using XRFID.Server.Demo.V2.Repositories.Interfaces
+@inject IRawTagHistoryRepository _tagHistoryRepo
+@inject IMovementItemRepository _movementItemRepo
+@inject IMovementRepository _movementRepo
+
+<PageTitle>
+    @TITLE
+</PageTitle>
+
+<div class="content-container align-items-center" style="gap:25px">
+    <MudItem xs="12" sm="3">
+        <MudSelect T="Movement" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter"
+                   ValueChanged="@OnValueChange" Placeholder="Select a Movement">
+            @foreach (var move in MovementList)
+            {
+                <MudSelectItem Value="@move">@move.DateCreated (Active: @move.IsActive)</MudSelectItem>
+            }
+        </MudSelect>
+    </MudItem>
+    @if (Points.Count() > 0)
+    {
+        <MudStack AlignItems="AlignItems.Center">
+            @if (_selected == 1)
+            {
+            <MudContainer Style="width: 55vw; height: 85vh; align-items: center">
+                <div class="h6" style="text-align:center"> Track History </div>
+                <SfChart @ref="@sfChart1" Width="100%" Height="100%">
+                    <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Double" Minimum="-8" Maximum="8" Interval="1" />
+                    <ChartPrimaryYAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Double" Minimum="-8" Maximum="8" Interval="1" />
+                    <ChartSeriesCollection>
+                        <ChartSeries DataSource="@Points" XName="X" YName="Y" Type="ChartSeriesType.Scatter" Opacity="1">
+                            <ChartMarker Height="10" Width="10" Shape="ChartShape.Circle">
+                            </ChartMarker>
+                        </ChartSeries>
+                    </ChartSeriesCollection>
+                    <ChartTooltipSettings Enable="true" />
+                </SfChart>
+            </MudContainer>
+            }
+            else if (_selected == 2)
+            {
+            <MudContainer Style="width: 55vw; height: 85vh; align-items: center">
+                <div class="h6" style="text-align:center"> X and Y Variation </div>
+                <SfChart @ref="@sfChart2" Width="100%" Height="100%">
+                    <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.DateTime" Interval="2" />
+                    <ChartPrimaryYAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Double" Interval="2" />
+                    <ChartSeriesCollection>
+                        <ChartSeries DataSource="@PointMessageX" XName="Timestamp" YName="Y" Type="ChartSeriesType.Line" Fill="blue" Name="X" />
+                        <ChartSeries DataSource="@PointMessageY" XName="Timestamp" YName="Y" Type="ChartSeriesType.Line" Fill="red" Name="Y" />
+                    </ChartSeriesCollection>
+                    <ChartTooltipSettings Enable="true" />
+                    <ChartLegendSettings Visible="true" />
+                </SfChart>
+            </MudContainer>
+            }
+            else
+            {
+            <MudContainer Style="width: 55vw; height: 85vh; align-items: center">
+                <div class="h6" style="text-align:center"> Heatmap </div>
+
+                <SfHeatMap @ref="@sfHeatMap" DataSource="@HeatMapData" Width="100%" Height="100%">
+                    <HeatMapXAxis>
+                        <HeatMapXAxisTextStyle Color="transparent" />
+                    </HeatMapXAxis>
+                    <HeatMapYAxis>
+                        <HeatMapYAxisTextStyle Color="transparent" />
+                    </HeatMapYAxis>
+                    <HeatMapTooltipSettings Enable="false" />
+                </SfHeatMap>
+            </MudContainer>
+            }
+            <MudPagination Color="Color.Primary" Count="3" @bind-Selected="@_selected" />
+        </MudStack>
+    }
+    else
+    {
+        <MudText> No Raw Data Available</MudText>
+    }
+    <MudTable Breakpoint="Breakpoint.None" Items="ZoneHistories" Hover="true" Bordered="true" Striped="true" Style="margin-top:20px;">
+        <ColGroup>
+            <col style="width: 33%;" />
+            <col style="width: 33%;" />
+            <col style="width: 33%;" />
+        </ColGroup>
+        <HeaderContent>
+            <MudTh>Timestamp</MudTh>
+            <MudTh>Previous Zone</MudTh>
+            <MudTh>Zone</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Timestamp">@context.dateTime</MudTd>
+            <MudTd DataLabel="Previous Zone">@context.PrevZone</MudTd>
+            <MudTd DataLabel="Zone">@context.Zone</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager HidePageNumber HidePagination PageSizeOptions="new int[] {20, 50}" />
+        </PagerContent>
+    </MudTable>
+</div>
+
+@code {
+    [Parameter]
+    public string reader { get; set; } = null!;
+
+    [Parameter]
+    public string epc { get; set; } = null!;
+
+
+    private int _selected = 1;
+
+    private SfChart sfChart1 = null!;
+    private SfChart sfChart2 = null!;
+    private SfHeatMap<object> sfHeatMap = null!;
+
+    private const string TITLE = "PlotTrackHistory";
+    private ObservableCollection<PointMessage> Points = [];
+    private object HeatMapData { get; set; } = null!;
+    private ObservableCollection<ChartData> PointMessageX { get; set; } = [];
+    private ObservableCollection<ChartData> PointMessageY { get; set; } = [];
+
+    private ObservableCollection<ZoneMovement> ZoneHistories { get; set; } = [];
+    private ObservableCollection<Movement> MovementList = new();
+
+    private Transition transition = Transition.Slide;
+
+
+    public class ZoneMovement
+    {
+        public DateTimeOffset dateTime { get; set; }
+        public string PrevZone { get; set; }
+        public string Zone { get; set; }
+    }
+
+    public class ChartData
+    {
+        public double Y { get; set; }
+        public DateTimeOffset Timestamp { get; set; }
+    }
+
+    protected override void OnInitialized()
+    {
+        CheckMovementAsync();
+        base.OnInitialized();
+    }
+
+    public async Task OnValueChange(Movement movement)
+    {
+        
+
+        try
+        {
+            if (sfChart1 != null && sfChart2 != null && sfHeatMap != null)
+            {
+                await sfChart1.RefreshAsync();
+                await sfChart2.RefreshAsync();
+                await sfHeatMap.RefreshBoundAsync();
+            }
+        }
+        catch(Exception)
+        {
+            
+        }
+        FetchData(movement);
+
+        StateHasChanged();
+    }
+}

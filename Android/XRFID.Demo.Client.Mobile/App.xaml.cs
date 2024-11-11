@@ -8,7 +8,7 @@ public partial class App : TinyApplication
     public App()
     {
         Syncfusion.Licensing.SyncfusionLicenseProvider
-            .RegisterLicense("your_syncfusion_license"); //You need to edit the content with your syncfusion license
+            .RegisterLicense("MzU1NDgxM0AzMjM3MmUzMDJlMzBXNWZoRktHMGZqbUZrY1BIK1JzRnVLSWZzRGlrRkFGR0RKWlhpL1RRVG84PQ=="); //You need to edit the content with your syncfusion license
 
         InitializeComponent();
 

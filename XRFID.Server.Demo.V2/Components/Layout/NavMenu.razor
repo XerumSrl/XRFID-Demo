@@ -1,0 +1,35 @@
+﻿<MudNavMenu Class="h-100" Style="positon:fixed;">
+    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+    <MudDivider Class="my-2" />
+    <MudNavLink Href="CheckItems" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Checklist">Check RFID</MudNavLink>
+    @* <MudNavLink Href="PrintLabels" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Nfc">Print RFID</MudNavLink> *@
+    <MudNavLink Href="Locationing" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.MyLocation">Locationing RFID</MudNavLink>
+    <MudDivider Class="my-2" />
+    <MudNavGroup Title="Settings" Icon="@Icons.Material.Filled.Settings" Expanded="false">
+        <MudNavLink Href="Settings" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Settings">Overview</MudNavLink>
+        <MudNavLink Href="LoadingUnits" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Loading Units</MudNavLink>
+        <MudNavLink Href="Skus" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddBox">Skus</MudNavLink>
+        <MudNavLink Href="Products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Label">Products</MudNavLink>
+        <MudNavLink Href="Readers" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ChromeReaderMode">Readers</MudNavLink>
+        <MudNavLink Href="Printers" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Print">Printers</MudNavLink>
+        <MudNavLink Href="Labels" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.NewLabel">Labels</MudNavLink>
+    </MudNavGroup>
+    <MudDivider Class="my-2" />
+    <MudSpacer></MudSpacer>
+    <MudNavLink Icon="@Icons.Material.Filled.Info" OnClick="@ToggleInfo">
+        Credits
+
+        <MudPopover Open="_open" OverflowBehavior="OverflowBehavior.FlipAlways" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopRight" Paper="true">
+            <About />
+        </MudPopover>
+    </MudNavLink>
+</MudNavMenu>
+
+@code {
+    private bool _open;
+
+    public void ToggleInfo()
+    {
+        _open = !_open;
+    }
+}

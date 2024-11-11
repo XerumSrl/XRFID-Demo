@@ -1,6 +1,7 @@
 ﻿using XRFID.Demo.Client.Mobile.Data.Dto;
 using XRFID.Demo.Client.Mobile.Data.Enums;
 using XRFID.Demo.Client.Mobile.Data.Services.Interfaces;
+using Microsoft.Maui.Devices;
 
 namespace XRFID.Demo.Client.Mobile.Data.Services;
 public class GeneralSettings : IGeneralSettings

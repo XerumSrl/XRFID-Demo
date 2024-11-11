@@ -2,7 +2,7 @@
 <mvvm:TinyView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                xmlns:mvvm="clr-namespace:TinyMvvm;assembly=TinyMvvm.Maui"
-               xmlns:syncfusion="clr-namespace:Syncfusion.Maui.DataGrid;assembly=Syncfusion.Maui.DataGrid"
+               xmlns:syncfusion="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
              x:Class="XRFID.Demo.Client.Mobile.Views.CheckItem.CheckItemRfidView"
              Title="CHECK ITEM">
     
@@ -68,16 +68,34 @@
                          HorizontalOptions="Fill"/>
         </VerticalStackLayout>
 
-        <syncfusion:SfDataGrid Grid.Row="1" 
-                               ItemsSource="{Binding TagsView}"
-                               ColumnWidthMode="Fill"
-                               HeaderRowHeight="50"
-                               RowHeight="60">
-            <syncfusion:SfDataGrid.DefaultStyle>
-                <syncfusion:DataGridStyle HeaderRowBackground="#E3F2FD" HeaderRowTextColor="Black" 
-                                          HeaderRowFontAttributes="Bold"/>
-            </syncfusion:SfDataGrid.DefaultStyle>
-        </syncfusion:SfDataGrid>
+        <syncfusion:SfListView Grid.Row="1"
+                       ItemsSource="{Binding TagsView}"
+                       ItemSize="60">
+            <syncfusion:SfListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <StackLayout Orientation="Horizontal" Padding="10">
+                            <Label Text="{Binding Epc}" 
+                           FontAttributes="Bold" 
+                           TextColor="Black">
+                                <Label.Style>
+                                    <Style TargetType="Label">
+                                        <Style.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding Status}" Value="FOUND">
+                                                <Setter Property="BackgroundColor" Value="Green"/>
+                                            </DataTrigger>
+                                            
+                                        </Style.Triggers>
+                                    </Style>
+                                </Label.Style>
+                            </Label>
+                        </StackLayout>
+                    </ViewCell>
+                </DataTemplate>
+            </syncfusion:SfListView.ItemTemplate>
+        </syncfusion:SfListView>
+
+
     </Grid>
 
 </mvvm:TinyView>

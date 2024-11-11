@@ -2,7 +2,6 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Xerum.XFramework.MassTransit;
 using XRFID.Demo.Modules.Mqtt.Interfaces;
 
 namespace XRFID.Demo.Modules.Mqtt.Payloads;
@@ -12,7 +11,7 @@ namespace XRFID.Demo.Modules.Mqtt.Payloads;
 /// Reader network information
 /// </summary>
 [DataContract]
-public class GetNetworkResponse : IMqttResponseData, IRequestMessage
+public class GetNetworkResponse : IMqttResponseData
 {
     /// <summary>
     /// Host name of the reader

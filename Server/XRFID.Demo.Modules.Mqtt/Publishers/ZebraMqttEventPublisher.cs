@@ -5,31 +5,34 @@ using XRFID.Demo.Modules.Mqtt.Events;
 
 namespace XRFID.Demo.Modules.Mqtt.Publishers;
 
-public class ZebraMqttEventPublisher : IZebraMqttEventPublisher
+public class ZebraMqttEventPublisher(IBusControl _busControl, ILogger<ZebraMqttEventPublisher> _logger) : IZebraMqttEventPublisher
 {
-    private readonly IBusControl busControl;
-    private readonly ILogger<ZebraMqttEventPublisher> logger;
-    public ZebraMqttEventPublisher(IBusControl busControl, ILogger<ZebraMqttEventPublisher> logger)
-    {
-        this.busControl = busControl;
-        this.logger = logger;
-    }
 
     public async Task Publish(Heartbeat request)
     {
         // consumed by public class HeartbeatConsumer : IRequestConsumer<Heartbeat>
-        await busControl.Publish<Heartbeat>(request, ctx => { ctx.TimeToLive = TimeSpan.FromMinutes(5); });
+        await _busControl.Publish<Heartbeat>(request, ctx => { ctx.TimeToLive = TimeSpan.FromMinutes(5); });
     }
 
     public async Task Publish(ZebraGpiData request)
     {
         // consumed by public class ZebraGpioDataConsumer : IRequestConsumer<ZebraGpiData>
-        await busControl.Publish<ZebraGpiData>(request, ctx => { ctx.TimeToLive = TimeSpan.FromMinutes(5); });
+        await _busControl.Publish<ZebraGpiData>(request, ctx => { ctx.TimeToLive = TimeSpan.FromMinutes(5); });
     }
 
     public async Task Publish(ZebraTagData request)
     {
         // consumed by ZebraTagDataConsumer : IRequestConsumer<ZebraTagData>
-        await busControl.Publish<ZebraTagData>(request, ctx => { ctx.TimeToLive = TimeSpan.FromMinutes(5); });
+        await _busControl.Publish<ZebraTagData>(request, ctx => { ctx.TimeToLive = TimeSpan.FromMinutes(5); });
+    }
+
+    public async Task Publish(ZebraDirectionalityTagData request)
+    {
+        await _busControl.Publish<ZebraDirectionalityTagData>(request, ctx => { ctx.TimeToLive = TimeSpan.FromMinutes(5); });
+    }
+
+    public async Task Publish(ZebraRawDirectionalityTagData request)
+    {
+        await _busControl.Publish<ZebraRawDirectionalityTagData>(request, ctx => { ctx.TimeToLive = TimeSpan.FromMinutes(5); });
     }
 }

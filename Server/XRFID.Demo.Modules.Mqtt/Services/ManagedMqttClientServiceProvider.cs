@@ -1,6 +1,6 @@
 ﻿using XRFID.Demo.Modules.Mqtt.Interfaces;
 
-namespace XRFID.Demo.Modules.Services;
+namespace XRFID.Demo.Modules.Mqtt.Services;
 
 public class ManagedMqttClientServiceProvider
 {

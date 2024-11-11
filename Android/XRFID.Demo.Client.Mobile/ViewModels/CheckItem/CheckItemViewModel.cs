@@ -9,7 +9,7 @@ using XRFID.Demo.Client.Mobile.Messages;
 using XRFID.Demo.Client.Mobile.Platforms.Android.Interfaces;
 using XRFID.Demo.Common.Dto;
 
-namespace XRFID.Demo.Client.Mobile.ViewModels;
+namespace XRFID.Demo.Client.Mobile.ViewModels.CheckItem;
 public partial class CheckItemViewModel : TinyViewModel, IDisposable
 {
     private readonly IBarcodeService barcodeService;
@@ -50,7 +50,7 @@ public partial class CheckItemViewModel : TinyViewModel, IDisposable
         {
             if (barcode != value)
             {
-                if (value.Length > (barcode.Length) + 1)
+                if (value.Length > barcode.Length + 1)
                 {
                     barcode = value;
                     if (barcode is null || barcode == string.Empty)
@@ -239,11 +239,10 @@ public partial class CheckItemViewModel : TinyViewModel, IDisposable
             {
                 Id = Guid.NewGuid(),
                 Name = $"{thisReader.Name}_{DateTime.Now}",
-                Code = "",
                 Reference = Guid.NewGuid().ToString(),
 
-                CreationTime = DateTime.Now,
-                LastModificationTime = DateTime.Now,
+                DateCreated = DateTime.Now,
+                DateUpdated = DateTime.Now,
                 Description = "",
 
                 Timestamp = DateTime.Now,
@@ -267,7 +266,6 @@ public partial class CheckItemViewModel : TinyViewModel, IDisposable
                 {
                     Id = Guid.NewGuid(),
                     Name = lui.Name,
-                    Code = lui.Code is not null ? lui.Code : "",
                     Description = lui.Description,
                     Reference = Guid.NewGuid().ToString(),
                     Epc = lui.Epc,
@@ -278,7 +276,8 @@ public partial class CheckItemViewModel : TinyViewModel, IDisposable
                     LastRead = DateTime.Now,
                     IgnoreUntil = DateTime.Now.AddDays(1),
 
-                    LoadingUnitItemId = lui.Id,
+                    ZoneName = "",
+                    LoadingUnitItemId = lui.Id
                 };
                 newMov.MovementItems.Add(newItem);
             };
@@ -333,10 +332,10 @@ public partial class CheckItemViewModel : TinyViewModel, IDisposable
                 });
             }
 
-            MainThread.BeginInvokeOnMainThread(() =>
-            {
-                Shell.Current.GoToAsync("rfid", new Dictionary<string, object> { ["TagsView"] = tags, });
-            });
+            //MainThread.BeginInvokeOnMainThread(() =>
+            //{
+            await Shell.Current.GoToAsync("rfid", new Dictionary<string, object> { ["TagsView"] = tags });
+            //});
 
             IsBusy = false;
 
@@ -344,14 +343,14 @@ public partial class CheckItemViewModel : TinyViewModel, IDisposable
         catch (Exception ex)
         {
             IsBusy = false;
-            await App.Current.MainPage.DisplayAlert("Alert", ex + "" + ex.Message, "OK");
+            await Application.Current.MainPage.DisplayAlert("Alert", ex + "" + ex.Message, "OK");
             return;
         }
     }
 
     private async Task<MovementDto> CreateMovement(OrderViewData order)
     {
-        ReaderDto thisReader = await apiHelper.GetReaderByNameAsync(Preferences.Default.Get<string>("device_name", string.Empty));
+        ReaderDto thisReader = await apiHelper.GetReaderByNameAsync(Preferences.Default.Get("device_name", string.Empty));
 
         if (thisReader is null)
         {
@@ -371,11 +370,10 @@ public partial class CheckItemViewModel : TinyViewModel, IDisposable
         {
             Id = Guid.NewGuid(),
             Name = $"{thisReader.Name}_{DateTime.Now}",
-            Code = "",
             Reference = Guid.NewGuid().ToString(),
 
-            CreationTime = DateTime.Now,
-            LastModificationTime = DateTime.Now,
+            DateCreated = DateTime.Now,
+            DateUpdated = DateTime.Now,
             Description = "",
 
             Timestamp = DateTime.Now,
@@ -399,7 +397,6 @@ public partial class CheckItemViewModel : TinyViewModel, IDisposable
             {
                 Id = Guid.NewGuid(),
                 Name = lui.Name,
-                Code = lui.Code is not null ? lui.Code : "",
                 Description = lui.Description,
                 Reference = Guid.NewGuid().ToString(),
                 Epc = lui.Epc,
@@ -410,7 +407,8 @@ public partial class CheckItemViewModel : TinyViewModel, IDisposable
                 LastRead = DateTime.Now,
                 IgnoreUntil = DateTime.Now.AddDays(1),
 
-                LoadingUnitItemId = lui.Id,
+                ZoneName = "",
+                LoadingUnitItemId = lui.Id
             };
             newMov.MovementItems.Add(newItem);
         };

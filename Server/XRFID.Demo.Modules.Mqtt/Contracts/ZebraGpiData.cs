@@ -3,7 +3,6 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Xerum.XFramework.MassTransit;
 using XRFID.Demo.Modules.Mqtt.Interfaces;
 
 namespace XRFID.Demo.Modules.Mqtt.Contracts;
@@ -13,7 +12,7 @@ namespace XRFID.Demo.Modules.Mqtt.Contracts;
 /// GPI Event
 /// </summary>
 [DataContract]
-public class ZebraGpiData : IMqttMessageData, IRequestMessage
+public class ZebraGpiData : IMqttMessageData
 {
     public ZebraGpiData()
     {

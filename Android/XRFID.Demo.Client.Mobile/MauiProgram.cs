@@ -8,6 +8,7 @@ using XRFID.Demo.Client.Mobile.Helpers;
 using XRFID.Demo.Client.Mobile.Platforms.Android.Interfaces;
 using XRFID.Demo.Client.Mobile.Platforms.Android.Services;
 using XRFID.Demo.Client.Mobile.ViewModels;
+using XRFID.Demo.Client.Mobile.ViewModels.CheckItem;
 using XRFID.Demo.Client.Mobile.Views;
 using XRFID.Demo.Client.Mobile.Views.CheckItem;
 using XRFID.Demo.Client.Mobile.Views.FindItem;

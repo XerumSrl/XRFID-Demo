@@ -1,0 +1,250 @@
+﻿@page "/"
+
+@using MudBlazor.Services
+@using System.Collections.ObjectModel
+@using XRFID.Server.Demo.V2.Entities
+@using XRFID.Server.Demo.V2.Repositories.Interfaces
+@using XRFID.Server.Demo.V2.ViewModels
+@using AutoMapper;
+@using Xerum.XFramework.DBAccess.Uow
+@using MudBlazor
+@inject NavigationManager Navigation;
+@implements IBrowserViewportObserver
+@inject IReaderRepository readerRepository;
+@inject IUnitOfWork uow;
+@inject IMapper mapper;
+@inject ILabelRepository _labelRepository
+@inject IPrinterRepository printerRepository;
+@inject ISkuRepository skuRepository;
+@inject IProductRepository productRepository;
+@inject ILoadingUnitRepository loadingUnitRepository;
+@inject ILoadingUnitItemRepository loadingUnitItemRepository;
+@inject ILabelRepository labelRepository;
+@inject ILogger<Home> _logger;
+
+<PageTitle>Home</PageTitle>
+<MudContainer>
+    <MudGrid>
+
+
+        <MudItem xs="12" sm="6">
+            <MudDataGrid Breakpoint="Breakpoint.None" Items="@ReaderList" Striped="true">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Readers</MudText>
+                    <MudSpacer />
+                </ToolBarContent>
+                <Columns>
+                    <PropertyColumn Property="x => x.Name">Readers</PropertyColumn>
+                </Columns>
+
+                <PagerContent>
+                    <MudBreakpointProvider>
+                        <MudDataGridPager RowsPerPageString="Rows:" ShowPageNumber="@tableNavigation" ShowNavigation="@tableNavigation" T="ReaderModel" PageSizeOptions="new int[]{ 2, int.MaxValue}" />
+                    </MudBreakpointProvider>
+                </PagerContent>
+            </MudDataGrid>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudDataGrid Breakpoint="Breakpoint.None" Items="@SkuList" Striped="true">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Skus</MudText>
+                    <MudSpacer />
+                </ToolBarContent>
+                <Columns>
+                    <PropertyColumn Property="x => x.Name">Skus</PropertyColumn>
+                </Columns>
+
+                <PagerContent>
+                    <MudBreakpointProvider>
+                        <MudDataGridPager RowsPerPageString="Rows:" ShowPageNumber="@tableNavigation" ShowNavigation="@tableNavigation" T="SkuModel" PageSizeOptions="new int[]{ 2, int.MaxValue}" />
+                    </MudBreakpointProvider>
+                </PagerContent>
+            </MudDataGrid>
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+
+            <MudDataGrid Breakpoint="Breakpoint.None" Items="@ProductList" Striped="true">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Products</MudText>
+                    <MudSpacer />
+                </ToolBarContent>
+                <Columns>
+                    <PropertyColumn Property="x => x.Name">Products</PropertyColumn>
+                </Columns>
+
+                <PagerContent>
+                    <MudBreakpointProvider>
+                        <MudDataGridPager RowsPerPageString="Rows:" ShowPageNumber="@tableNavigation" ShowNavigation="@tableNavigation" T="ProductModel" PageSizeOptions="new int[]{ 2, int.MaxValue}" />
+                    </MudBreakpointProvider>
+                </PagerContent>
+            </MudDataGrid>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudDataGrid Breakpoint="Breakpoint.None" Items="@PrinterList" Striped="true">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Printers</MudText>
+                    <MudSpacer />
+                </ToolBarContent>
+                <Columns>
+                    <PropertyColumn Property="x => x.Name">Printers</PropertyColumn>
+                </Columns>
+
+                <PagerContent>
+                    <MudBreakpointProvider>
+                        <MudDataGridPager RowsPerPageString="Rows:" ShowPageNumber="@tableNavigation" ShowNavigation="@tableNavigation" T="PrinterModel" PageSizeOptions="new int[]{ 2, int.MaxValue}" />
+                    </MudBreakpointProvider>
+                </PagerContent>
+            </MudDataGrid>
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudDataGrid Breakpoint="Breakpoint.None" Items="@LuList" Striped="true">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Loading Units</MudText>
+                    <MudSpacer />
+                </ToolBarContent>
+                <Columns>
+                    <PropertyColumn Property="x => x.Name">Loading Units</PropertyColumn>
+                </Columns>
+                <PagerContent>
+                    <MudBreakpointProvider>
+                        <MudDataGridPager RowsPerPageString="Rows:" ShowPageNumber="@tableNavigation" ShowNavigation="@tableNavigation" T="LoadingUnit" PageSizeOptions="new int[]{ 2, int.MaxValue}" />
+                    </MudBreakpointProvider>
+                </PagerContent>
+            </MudDataGrid>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudDataGrid Breakpoint="Breakpoint.None" Items="@LabelList" Striped="true">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Labels</MudText>
+                    <MudSpacer />
+                </ToolBarContent>
+                <Columns>
+                    <PropertyColumn Property="x => x.Name">Labels</PropertyColumn>
+                </Columns>
+                <PagerContent>
+                    <MudBreakpointProvider>
+                        <MudDataGridPager RowsPerPageString="Rows:" ShowPageNumber="@tableNavigation" ShowNavigation="@tableNavigation" T="LabelModel" PageSizeOptions="new int[]{ 2, int.MaxValue}" />
+                    </MudBreakpointProvider>
+                </PagerContent>
+            </MudDataGrid>
+        </MudItem>
+
+    </MudGrid>
+</MudContainer>
+
+
+@code {
+    private List<ReaderModel> ReaderList = new List<ReaderModel>();
+    private List<SkuModel> SkuList = new List<SkuModel>();
+    private List<ProductModel> ProductList = new List<ProductModel>();
+    private List<PrinterModel> PrinterList = new List<PrinterModel>();
+    private List<LoadingUnit> LuList = new List<LoadingUnit>();
+    private List<LabelModel> LabelList = new List<LabelModel>();
+    private List<string> _events = new();
+    public bool tableNavigation = true;
+
+
+    [Inject]
+    private IBrowserViewportService BrowserViewportService { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await BrowserViewportService.SubscribeAsync(this, fireImmediately: true);
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    public async ValueTask DisposeAsync() => await BrowserViewportService.UnsubscribeAsync(this);
+
+    Guid IBrowserViewportObserver.Id { get; } = Guid.NewGuid();
+
+    ResizeOptions IBrowserViewportObserver.ResizeOptions { get; } = new()
+        {
+            ReportRate = 250,
+            NotifyOnBreakpointOnly = true
+        };
+
+    Task IBrowserViewportObserver.NotifyBrowserViewportChangeAsync(BrowserViewportEventArgs browserViewportEventArgs)
+    {
+        if (browserViewportEventArgs.Breakpoint <= Breakpoint.Sm)
+        {
+            tableNavigation = false;
+        }
+        else
+        {
+            tableNavigation = true;
+        }
+
+        return InvokeAsync(StateHasChanged);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            ReaderList.Clear();
+            var reader = await readerRepository.GetAsync();
+            ReaderList.AddRange(mapper.Map<List<ReaderModel>>(reader));
+
+            await FillTableSku();
+
+            var products = await productRepository.GetAsync("Sku");
+            ProductList.AddRange(mapper.Map<List<ProductModel>>(products).OrderBy(q => q.SkuCode).ThenBy(q => q.Reference));
+
+            var printer = await printerRepository.GetAsync();
+            PrinterList.AddRange(mapper.Map<List<PrinterModel>>(printer));
+
+            var label = await labelRepository.GetAsync();
+            LabelList.AddRange(mapper.Map<List<LabelModel>>(label));
+
+            await FillTableLu();
+
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            _logger.LogInformation(e.Message);
+        }
+    }
+
+    private async Task FillTableSku()
+    {
+        var skus = await skuRepository.GetAsync();
+        if (skus is not null)
+        {
+            foreach (var sku in skus)
+            {
+                if (sku.Products is null || !sku.Products.Any())
+                {
+                    sku.Products = await productRepository.GetAsync(q => q.SkuId == sku.Id);
+                }
+
+            }
+
+            SkuList.AddRange(mapper.Map<List<SkuModel>>(skus));
+        }
+    }
+
+    private async Task FillTableLu()
+    {
+        var loadingUnits = await loadingUnitRepository.GetAsync();
+        if (loadingUnits is not null)
+        {
+            foreach (var lu in loadingUnits)
+            {
+                if (lu.LoadingUnitItems is null || !lu.LoadingUnitItems.Any())
+                {
+                    lu.LoadingUnitItems = await loadingUnitItemRepository.GetAsync(q => q.LoadingUnitId == lu.Id);
+                }
+            }
+            LuList = loadingUnits;
+
+        }
+    }
+
+}

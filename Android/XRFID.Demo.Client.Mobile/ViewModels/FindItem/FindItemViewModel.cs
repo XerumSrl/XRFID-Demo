@@ -98,7 +98,7 @@ public partial class FindItemViewModel : TinyViewModel
                 {
                     Name = prod.Name,
                     Epc = prod.Epc,
-                    Code = prod.Code,
+                    Code = prod.Reference,
                 });
             }
 

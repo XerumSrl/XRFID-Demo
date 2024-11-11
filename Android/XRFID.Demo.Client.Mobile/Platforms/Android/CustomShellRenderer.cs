@@ -6,6 +6,7 @@ using Google.Android.Material.BottomNavigation;
 using Microsoft.Maui.Controls.Handlers.Compatibility;
 using Microsoft.Maui.Controls.Platform.Compatibility;
 using System.ComponentModel;
+using Microsoft.Maui.ApplicationModel;
 
 namespace XRFID.Demo.Client.Mobile.Platforms.Android;
 

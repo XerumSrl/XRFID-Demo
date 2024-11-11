@@ -2,6 +2,9 @@
 using System.Text.Json;
 using XRFID.Demo.Client.Mobile.Data.Enums;
 using XRFID.Demo.Client.Mobile.Data.Services.Interfaces;
+using Microsoft.Maui.Storage;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Devices;
 
 namespace XRFID.Demo.Client.Mobile.Data.Services;
 public class AppSettings : IAppSettings

@@ -24,7 +24,7 @@ public class TagDto
 
     public short Rssi { get; set; }
 
-    public DateTime Timestamp { get; set; }
+    public DateTimeOffset Timestamp { get; set; }
 
     public int TagSeenCount { get; set; }
 
@@ -57,4 +57,7 @@ public class TagDto
     public Guid SessionId { get; set; }
 
     public Guid ReaderId { get; set; }
+
+    public string ZoneName { get; set; }
+    public string PrevZoneName { get; set; }
 }

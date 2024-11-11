@@ -2,7 +2,6 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Xerum.XFramework.MassTransit;
 using XRFID.Demo.Modules.Mqtt.Interfaces;
 
 namespace XRFID.Demo.Modules.Mqtt.Payloads;
@@ -12,7 +11,7 @@ namespace XRFID.Demo.Modules.Mqtt.Payloads;
 /// Updates GPO port state
 /// </summary>
 [DataContract]
-public class SetGpoResponse : IMqttResponseData, IRequestMessage
+public class SetGpoResponse : IMqttResponseData
 {
 
     /// <summary>

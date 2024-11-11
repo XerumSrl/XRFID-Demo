@@ -1,3 +1,4 @@
+using Microsoft.Maui.Storage;
 namespace XRFID.Demo.Client.Mobile.Views.PageSettings;
 
 [QueryProperty(nameof(Setting), "setting")]

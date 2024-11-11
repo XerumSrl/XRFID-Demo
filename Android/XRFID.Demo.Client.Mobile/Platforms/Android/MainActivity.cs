@@ -4,6 +4,7 @@ using Android.OS;
 using Symbol.XamarinEMDK;
 using Symbol.XamarinEMDK.Barcode;
 using XRFID.Demo.Client.Mobile.Platforms.Android.Interfaces;
+using Microsoft.Maui;
 
 namespace XRFID.Demo.Client.Mobile;
 [Activity(Theme = "@style/Maui.SplashTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
