@@ -27,14 +27,18 @@ public partial class CheckItemRfidViewModel : BaseRfidViewModel
     #endregion
 
     #region commands
+
+    public IAsyncRelayCommand ResetCommandAsync { get; }
+    public IAsyncRelayCommand ConfirmCommandAsync { get; }
+
     [RelayCommand]
-    public async Task ResetCommand()
+    public async Task ResetAsync()
     {
         StatsReset();
     }
 
     [RelayCommand]
-    public async Task ConfirmCommand()
+    public async Task ConfirmAsync()
     {
         alertService.LongToast("Confirmation command is ok");
     }
@@ -45,6 +49,8 @@ public partial class CheckItemRfidViewModel : BaseRfidViewModel
         IAlertService alertService) : base(rfidService, generalSettings)
     {
         this.alertService = alertService;
+        ResetCommandAsync = new AsyncRelayCommand(ResetAsync);
+        ConfirmCommandAsync = new AsyncRelayCommand(ConfirmAsync);
     }
 
     #region view methods
@@ -121,7 +127,7 @@ public partial class CheckItemRfidViewModel : BaseRfidViewModel
         TagViewData find = TagsView.FirstOrDefault(q => q.Epc == tag);
         if (find is not null)
         {
-            find.Status = "FOUND!";
+            find.Status = "FOUND";
         }
     }
 

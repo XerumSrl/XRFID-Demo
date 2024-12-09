@@ -6,10 +6,22 @@ namespace XRFID.Demo.Client.Mobile.Views.CheckItem;
 public partial class CheckItemRfidView
 {
 
+    private readonly CheckItemRfidViewModel viewModel;
+
     public CheckItemRfidView(CheckItemRfidViewModel viewModel)
     {
-        InitializeComponent();
-        BindingContext = viewModel;
+        try
+        {
+            InitializeComponent();
+            BindingContext = viewModel;
+            this.viewModel = viewModel;
+        }
+        catch (Exception e)
+        {
+            App.Current.MainPage.DisplayAlert("Page Error", e.StackTrace, "OK");
+            throw;
+        }
+
     }
 
     protected override void OnNavigatedTo(NavigatedToEventArgs args)

@@ -5,6 +5,8 @@ using XRFID.Demo.Client.Mobile.Data.Services.Interfaces;
 using XRFID.Demo.Client.Mobile.Data.ViewData;
 using XRFID.Demo.Client.Mobile.Messages;
 using XRFID.Demo.Client.Mobile.Platforms.Android.Interfaces;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Storage;
 
 namespace XRFID.Demo.Client.Mobile.ViewModels;
 

@@ -1,0 +1,133 @@
+﻿@page "/Products"
+@using AutoMapper;
+@using XRFID.Server.Demo.V2.Repositories.Interfaces
+@using XRFID.Server.Demo.V2.ViewModels
+@using Xerum.XFramework.DBAccess.Uow
+@inject NavigationManager Navigation;
+@inject IDialogService DialogService
+@inject IProductRepository productRepository;
+@inject IUnitOfWork uow;
+@inject IMapper mapper;
+@inject ISnackbar snackbar;
+
+<h1>Products</h1>
+
+<MudDataGrid Items="@ProductList"
+             ReadOnly="true"
+             SortMode="SortMode.Single" Filterable="true" QuickFilter="@_quickFilter" Striped="true">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Products</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudButton Class="ml-3" Variant="@Variant.Filled" Color="@Color.Secondary" StartIcon="@Icons.Material.Filled.Add" 
+        OnClick="@(() => AddProduct())">Add New</MudButton>
+    </ToolBarContent>
+    <Columns>
+        <TemplateColumn Filterable="false" Sortable="false">
+            <CellTemplate>
+                <MudStack Row>
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit" Size="Size.Small" OnClick="@((e) => EditProduct(@context.Item))" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" Size="Size.Small" OnClick="@((e) => DeleteProduct(@context.Item))" />
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Reference" />
+        <PropertyColumn Property="x => x.Description" />
+        <PropertyColumn Property="x => x.Epc" />
+        <PropertyColumn Property="x => x.SerialNumber" />
+        <PropertyColumn Property="x => x.SkuReference" Title="Sku Reference" />
+        <PropertyColumn Property="x => x.DateCreated" Title="Date Creation" />
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager RowsPerPageString="Rows:" T="ProductModel" />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    private List<ProductModel> ProductList = new List<ProductModel>();
+    private string _searchString;
+    private List<string> _events = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var products = await productRepository.GetAsync("Sku");
+        ProductList.AddRange(mapper.Map<List<ProductModel>>(products).OrderBy(q => q.SkuCode).ThenBy(q => q.Reference));
+        
+    }
+
+    async Task AddProduct()
+    {
+        Navigation.NavigateTo($"Products/Add");
+    }
+
+    async Task EditProduct(ProductModel item)
+    {
+        var parameters = new DialogParameters<ConfirmDialog>();
+        parameters.Add(x => x.ContentText, "Do you really want to edit these records?");
+        parameters.Add(x => x.ButtonText, "Edit");
+        parameters.Add(x => x.Color, Color.Primary);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall, /* DisableBackdropClick = true, */ CloseOnEscapeKey = true };
+
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>("Edit", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            Navigation.NavigateTo($"Products/Edit/{item.Id}");
+        }
+    }
+
+    async Task DeleteProduct(ProductModel item)
+    {
+        var parameters = new DialogParameters<ConfirmDialog>();
+        parameters.Add(x => x.ContentText, "Do you really want to delete these records? This process cannot be undone.");
+        parameters.Add(x => x.ButtonText, "Delete");
+        parameters.Add(x => x.Color, Color.Error);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall,/*  DisableBackdropClick = true, */ CloseOnEscapeKey = true };
+
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>("Delete", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            var checkItem = await productRepository.GetAsync(item.Id);
+            if (checkItem is not null)
+            {
+                await productRepository.ExecuteDeleteAsync(i => i.Id == item.Id);
+                
+                ProductList.Remove(item);
+                snackbar.Add($"Product {item.Name} deleted.", Severity.Success);
+
+            }
+            else
+            {
+                snackbar.Add("Invalid product Id.", Severity.Error);                
+            }
+            
+        }
+    }
+
+    // quick filter - filter gobally across multiple columns with the same input
+    private Func<ProductModel, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (!string.IsNullOrEmpty(x.Name) && x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!string.IsNullOrEmpty(x.Reference) && x.Reference.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.Epc.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.SerialNumber.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    };
+
+}

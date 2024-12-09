@@ -2,6 +2,7 @@ using Android.Content;
 using Android.OS;
 using Android.Views.InputMethods;
 using XRFID.Demo.Client.Mobile.ViewModels;
+using Microsoft.Maui.ApplicationModel;
 
 namespace XRFID.Demo.Client.Mobile.Views.FindItem;
 

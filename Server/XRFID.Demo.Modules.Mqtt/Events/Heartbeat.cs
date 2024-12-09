@@ -2,7 +2,6 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Xerum.XFramework.MassTransit;
 using XRFID.Demo.Modules.Mqtt.Interfaces;
 
 namespace XRFID.Demo.Modules.Mqtt.Events;
@@ -12,7 +11,7 @@ namespace XRFID.Demo.Modules.Mqtt.Events;
 /// Heartbeat Event
 /// </summary>
 [DataContract]
-public class Heartbeat : IMqttMessageData, IRequestMessage
+public class Heartbeat : IMqttMessageData
 {
 
     /// <summary>

@@ -1,26 +1,31 @@
 ﻿using Xerum.XFramework.Common.Dto;
+using Xerum.XFramework.Common.Enums;
 
 namespace XRFID.Demo.Common.Dto;
 
-public class LoadingUnitDto : RestEntityDto
+public class LoadingUnitDto : BaseDto
 {
     public int Sequence { get; set; }
-
-    public string Description { get; set; } = string.Empty;
-
-    public DateTime Timestamp { get; set; } = DateTime.Now;
+    public WorkflowType Type { get; set; }
+    public string? Description { get; set; }
 
     public bool IsActive { get; set; }
-
     public bool IsValid { get; set; }
-
     public bool IsConsolidated { get; set; }
+    public bool Sent { get; set; }
 
     public Guid ReaderId { get; set; }
 
-    public Guid? OrderId { get; set; }
+    #region Custom attributes
+    public string? Attribute1 { get; set; }
+    public string? Attribute2 { get; set; }
+    #endregion
 
-    public string? OrderReference { get; set; }
+    #region Data Relations
 
-    public List<LoadingUnitItemDto> LoadingUnitItems { get; set; } = new List<LoadingUnitItemDto>();
+    public ReaderDto? Reader { get; set; }
+
+    public ICollection<LoadingUnitItemDto> LoadingUnitItems { get; set; } = [];
+
+    #endregion
 }

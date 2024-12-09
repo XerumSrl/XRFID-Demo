@@ -1,5 +1,7 @@
-﻿using RestSharp;
+﻿using Microsoft.Extensions.Logging;
+using RestSharp;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Xerum.XFramework.Common;
 using XRFID.Demo.Common.Dto;
 
@@ -11,7 +13,9 @@ public class RestApiHelper
     private readonly string _baseApiUrl;
     private readonly RestClient _client;
 
-    public RestApiHelper()
+    public ILogger<RestApiHelper> _logger { get; }
+
+    public RestApiHelper(ILogger<RestApiHelper> logger)
     {
         _baseApiUrl = Preferences.Default.Get<string>("api_endpoint", "https://localhost:5001/api/");
 
@@ -22,6 +26,7 @@ public class RestApiHelper
             RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
         };
         _client = new RestClient(options);
+        _logger = logger;
     }
 
     #region Requests
@@ -202,8 +207,9 @@ public class RestApiHelper
                 return null;
             }
         }
-        catch (Exception)
+        catch (Exception e)
         {
+            _logger.LogError(e, "");
             return null;
         }
 
@@ -315,10 +321,12 @@ public class RestApiHelper
             {
                 return null;
             }
-            result = JsonSerializer.Deserialize<XResponseData<MovementDto>>(response.Content)?.Result;
+
+            result = JsonSerializer.Deserialize<XResponseData<MovementDto>>(response.Content, new JsonSerializerOptions { ReferenceHandler = ReferenceHandler.IgnoreCycles })?.Result;
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "");
             return null;
         }
 

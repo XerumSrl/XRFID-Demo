@@ -3,6 +3,8 @@ using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Mvvm.Input;
 using System.Text.RegularExpressions;
 using TinyMvvm;
+using Microsoft.Maui.Devices;
+using Microsoft.Maui.Storage;
 
 namespace XRFID.Demo.Client.Mobile.ViewModels;
 

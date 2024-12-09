@@ -1,0 +1,194 @@
+﻿@page "/Locationing"
+@implements IDisposable
+@using Syncfusion.Blazor
+@using Syncfusion.Blazor.Charts
+@using Syncfusion.Blazor.Buttons
+@using Microsoft.AspNetCore.SignalR.Client
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Grids;
+@using System.Collections.ObjectModel
+@using GridSelectionType = Syncfusion.Blazor.Grids.SelectionType;
+@using ButtonSelectionType = Syncfusion.Blazor.Buttons.SelectionType;
+@using System.Text.Json.Serialization
+@using XRFID.Demo.Modules.Mqtt.Contracts
+@using XRFID.Demo.Modules.Mqtt.Payloads
+@using XRFID.Demo.Modules.Mqtt.Publishers
+@using XRFID.Server.Demo.V2.DataStores
+@using XRFID.Server.Demo.V2.DataStructures.SignalR
+@using XRFID.Server.Demo.V2.Entities
+@using XRFID.Server.Demo.V2.Repositories.Interfaces
+@using XRFID.Server.Demo.V2.Workers
+@using static XRFID.Server.Demo.V2.DataStructures.Misc.PlotDataObject
+
+@inject NavigationManager _navigationManager
+@inject IRawTagHistoryRepository _tagRepo
+@inject NavigationManager _navigation
+@inject ILogger<Locationing> _logger
+@inject IReaderRepository _readerRepo
+@inject IZebraMqttEventPublisher _zebraEventPublisher
+@inject PointDataStores _pointDataStores
+@inject CheckPageWorker _worker
+@inject IZebraMqttCommandPublisher _commandPublisher
+
+<PageTitle>
+    @TITLE
+</PageTitle>
+
+<MudContainer>
+    <MudGrid>
+        <MudItem xs="12" sm="6">
+            <h1>Real Time Locationing System</h1>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudSelect T="Reader" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter"
+                       ValueChanged="@OnValueChange" Placeholder="Select a Reader">
+                @foreach (var reader in readerList.OrderBy(q => q.Name))
+                {
+                    <MudSelectItem Value="@reader">@reader.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+    </MudGrid>
+
+    <MudGrid Style="align-items:center" Justify="Justify.SpaceEvenly">
+
+        <MudItem xs="12" sm="2">
+            <MudStack Row="true">
+                <MudText Style="align-content: center"> Reader Height: </MudText>
+                <MudTextField Style="width: 50px" Disabled="@Reading" @bind-Value="@_pointDataStores.ReaderHeight" />
+            </MudStack>
+        </MudItem>
+        <MudItem xs="12" sm="2">
+            <MudStack Row="true">
+                <MudText Style="align-content: center"> Tag Height: </MudText>
+                <MudTextField Style="width: 50px" Disabled="@Reading" @bind-Value="@_pointDataStores.ObjectHeight" />
+            </MudStack>
+        </MudItem>
+        <MudItem xs="12" sm="2">
+            <MudStack Row="true">
+                <MudText Style="align-content: center"> EPC filter: </MudText>
+                <MudTextField Style="width: 50px" Disabled="@Reading" @bind-Value="@_pointDataStores.EpcFilter" />
+            </MudStack>
+        </MudItem>
+        <MudItem xs="12" sm="3">
+            <MudStack Row="true">
+                <MudText Style="align-content: center">Reading Status</MudText>
+                <MudSwitch Value="@Reading" Style="margin:0; align-self:center" Disabled="@notSelected" T="bool" Color="Color.Primary" ValueChanged="@SendCommand" />
+            </MudStack>
+        </MudItem>
+        <MudItem xs="12" sm="2">
+            <MudStack Row="true">
+                <MudText Style="align-content: center">Db Save</MudText>
+                <MudSwitch Value="@_pointDataStores.dbSave" Style="margin:0; align-self:center" Disabled="@notSelected" T="bool" Color="Color.Primary" ValueChanged="@DbSave" />
+            </MudStack>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+<MudContainer Style="height: 85vh">
+    <SfChart @ref="@sfChart" Height="100%" Width="100%">
+
+        <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Double" Minimum="-8" Maximum="8" Interval="1" />
+        <ChartPrimaryYAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Double" Minimum="-8" Maximum="8" Interval="1" />
+        <ChartSeriesCollection>
+            @lock (dicts)
+            {
+                @foreach (PlotDataObj dataObj in dicts.Keys)
+                {
+                    <ChartSeries DataSource="@dicts[dataObj]" XName="X" YName="Y" Type="ChartSeriesType.Scatter" Fill="@dataObj.Color" Opacity="1" Name="@dataObj.Epc">
+                        <ChartMarker Height="10" Width="10" Shape="ChartShape.Circle" />
+                    </ChartSeries>
+                    List<PointMessage> lastPointCollection = new List<PointMessage>();
+                    if (dicts[dataObj].Count > 0)
+                    {
+                        lastPointCollection.Add(dicts[dataObj].Last());
+                    }
+                    <ChartSeries DataSource="@lastPointCollection" XName="X" YName="Y" Type="ChartSeriesType.Scatter" Fill="@dataObj.Color" Opacity="1" Name="@dataObj.Epc">
+                        <ChartMarker Height="15" Width="15" Shape="ChartShape.Circle" />
+                    </ChartSeries>
+                }
+            }
+        </ChartSeriesCollection>
+        <ChartLegendSettings Visible="false" />
+        <ChartTooltipSettings Enable="true" Opacity="0.6" />
+
+    </SfChart>
+</MudContainer>
+
+<MudItem Style="width: 100%; padding-top:9px">
+    @lock (dicts)
+    {
+        <MudTable Items="tablePoints" Hover="true" Bordered="true" Striped="true">
+            <ColGroup>
+                <col style="width: 10%;" />
+                <col style="width: 45%;" />
+                <col style="width: 45%;" />
+            </ColGroup>
+            <HeaderContent>
+                <MudTh></MudTh>
+                <MudTh>EPC</MudTh>
+                <MudTh>Last Seen Timestamp</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>
+                    <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => Navigate((PlotDataObj)context))">
+                        <MudIcon Icon="@Icons.Material.Filled.Timeline"></MudIcon>
+                    </MudButton>
+                </MudTd>
+                <MudTd DataLabel="EPC">@context.Epc</MudTd>
+                <MudTd DataLabel="Last Seen Timestamp">@context.Timestamp</MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager RowsPerPageString="Rows:" PageSizeOptions="new int[] {10, 20, 50}" />
+            </PagerContent>
+        </MudTable>
+    }
+</MudItem>
+
+
+
+@code {
+
+    private const string TITLE = "Locationing";
+
+    private ObservableCollection<Reader> readerList = new();
+    private Reader selectedReader;
+    private bool notSelected = true;
+    private bool Reading = false;
+
+    private SfChart sfChart = null!;
+    private Dictionary<PlotDataObj, List<PointMessage>> dicts = [];
+    private ObservableCollection<PlotDataObj> tablePoints = [];
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await CheckReadersAsync();
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "");
+        }
+    }
+
+    public async Task OnValueChange(Reader value)
+    {
+        tablePoints.Clear();
+        notSelected = false;
+        _logger.LogInformation(value.Name);
+        selectedReader = value;
+
+        var reader = await _readerRepo.GetByNameAsync(value.Name) ?? throw new NullReferenceException("Reader does not exist");
+
+
+        connection?.StopAsync();
+        Task initConnection = InitializeConnectionAsync();
+        Task fetchData = FetchDataAsync();
+        await Task.WhenAll(initConnection, fetchData);
+
+        StateHasChanged();
+    }
+}

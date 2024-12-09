@@ -5,7 +5,7 @@ using CommunityToolkit.Maui.Behaviors;
 using CommunityToolkit.Maui.Converters;
 using System.Collections.ObjectModel;
 using XRFID.Demo.Client.Mobile.Data.ViewData;
-using XRFID.Demo.Client.Mobile.ViewModels;
+using XRFID.Demo.Client.Mobile.ViewModels.CheckItem;
 
 namespace XRFID.Demo.Client.Mobile.Views.CheckItem;
 

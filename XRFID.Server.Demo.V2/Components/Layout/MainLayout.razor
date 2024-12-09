@@ -1,0 +1,115 @@
+﻿@using MudBlazor.Services
+@using MudBlazor.Utilities;
+@implements IBrowserViewportObserver
+@inherits LayoutComponentBase
+
+<PageTitle>XRFID Demo Webserver</PageTitle>
+
+<MudPopoverProvider />
+
+<MudThemeProvider @bind-IsDarkMode="_darkMode" Theme="@theme" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="1" Dense="true">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudSpacer />
+    </MudAppBar>
+    @if(_openMiniOnHover){
+        <MudDrawer @bind-Open="_drawerOpen" ClipMode="@DrawerClipMode.Always" Elevation="1" Variant="@DrawerVariant.Mini" OpenMiniOnHover="@true">
+            <MudDrawerHeader Class="ml-n3 pl-n2">
+                <MudStack Row AlignItems="AlignItems.Center">
+                    <MudImage Src="images/logo.png" Alt="XRFID Demo Logo" Elevation="0" Class="rounded-lg" Width="32" Height="32" />
+                    @if (_drawerOpen)
+                    {
+                        <MudText Typo="Typo.h6"><p class="flex-nowrap">XRFID Demo</p></MudText>
+                    }
+                </MudStack>
+            </MudDrawerHeader>
+            <NavMenu />
+        </MudDrawer>
+    }else{
+        <MudDrawer @bind-Open="_drawerOpen" ClipMode="@DrawerClipMode.Always" Elevation="1">
+            <MudDrawerHeader Class="ml-n3 pl-n2">
+                <MudStack Row AlignItems="AlignItems.Center">
+                    <MudImage Src="images/logo.png" Alt="XRFID Demo Logo" Elevation="0" Class="rounded-lg" Width="32" Height="32" />
+                    @if (_drawerOpen)
+                    {
+                        <MudText Typo="Typo.h6"><p class="flex-nowrap">XRFID Demo</p></MudText>
+                    }
+                </MudStack>
+            </MudDrawerHeader>
+            <NavMenu />
+        </MudDrawer>
+    }
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Large" Style="height:100%" Class="my-4">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    bool _drawerOpen = true;
+    bool _darkMode = false;
+    bool _openMiniOnHover = true;
+
+    MudTheme theme = new MudTheme
+        {
+            PaletteLight = new PaletteLight
+            {
+                AppbarBackground = new MudColor(229, 90, 51, 255),
+                Primary = new MudColor(229, 90, 51, 255),
+                Secondary = new MudColor(53, 102, 139, 255)
+            },
+            PaletteDark = new PaletteDark
+            {
+                AppbarBackground = new MudColor(229, 90, 51, 255),
+                Primary = new MudColor(229, 90, 51, 255),
+                Secondary = new MudColor(53, 102, 139, 255)
+            }
+        };
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    [Inject]
+    private IBrowserViewportService BrowserViewportService { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await BrowserViewportService.SubscribeAsync(this, fireImmediately: true);
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    public async ValueTask DisposeAsync() => await BrowserViewportService.UnsubscribeAsync(this);
+
+    Guid IBrowserViewportObserver.Id { get; } = Guid.NewGuid();
+
+    ResizeOptions IBrowserViewportObserver.ResizeOptions { get; } = new()
+        {
+            ReportRate = 250,
+            NotifyOnBreakpointOnly = true
+        };
+
+    Task IBrowserViewportObserver.NotifyBrowserViewportChangeAsync(BrowserViewportEventArgs browserViewportEventArgs)
+    {
+        if (browserViewportEventArgs.Breakpoint <= Breakpoint.Sm)
+        {
+            _openMiniOnHover = false;
+        }
+        else
+        {
+            _openMiniOnHover = true;
+        }
+
+        return InvokeAsync(StateHasChanged);
+    }
+}

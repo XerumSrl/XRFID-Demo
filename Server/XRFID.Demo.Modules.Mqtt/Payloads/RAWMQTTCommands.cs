@@ -3,7 +3,6 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Xerum.XFramework.MassTransit;
 using XRFID.Demo.Modules.Mqtt.Interfaces;
 
 namespace XRFID.Demo.Modules.Mqtt.Payloads;
@@ -13,7 +12,7 @@ namespace XRFID.Demo.Modules.Mqtt.Payloads;
 /// 
 /// </summary>
 [DataContract]
-public class RAWMQTTCommands : IRequestMessage, IRAWCommand
+public class RAWMQTTCommands : IRAWCommand
 {
     /// <summary>
     /// Gets or Sets ReaderId

@@ -8,6 +8,7 @@ using XRFID.Demo.Client.Mobile.Data.Services.Interfaces;
 using XRFID.Demo.Client.Mobile.Messages;
 using XRFID.Demo.Client.Mobile.Platforms.Android.Interfaces;
 using Timer = System.Timers.Timer;
+using Microsoft.Maui.ApplicationModel;
 
 namespace XRFID.Demo.Client.Mobile.Base;
 

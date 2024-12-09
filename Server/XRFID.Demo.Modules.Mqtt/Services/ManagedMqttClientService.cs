@@ -6,6 +6,7 @@ using MQTTnet.Extensions.ManagedClient;
 using MQTTnet.Packets;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using XRFID.Demo.Modules.Mqtt.Contracts;
 using XRFID.Demo.Modules.Mqtt.Events;
@@ -23,6 +24,7 @@ public class ManagedMqttClientService : IManagedMqttClientService
     private ManagedMqttClientOptions options;
     private IServiceScopeFactory serviceScopeFactory;
 
+    private readonly JsonSerializerOptions _settings = new JsonSerializerOptions();
     public IManagedMqttClient MqttClient { get; set; }
 
     public ManagedMqttClientService(ManagedMqttClientOptions options,
@@ -34,6 +36,10 @@ public class ManagedMqttClientService : IManagedMqttClientService
         this.logger = logger;
         this.options = options;
         this.serviceScopeFactory = serviceScopeFactory;
+
+        _settings.Converters.Add(new JavaDateTimeOffsetConverter());
+        _settings.Converters.Add(new JsonStringEnumConverter());
+        _settings.PropertyNamingPolicy = null;
 
         MqttClient = new MqttFactory().CreateManagedMqttClient();
         ConfigureMqttClient();
@@ -106,6 +112,9 @@ public class ManagedMqttClientService : IManagedMqttClientService
 
             logger.LogDebug("[ConfigureMqttClient] Topic: {Topic}", arg.ApplicationMessage.Topic);
             logger.LogDebug("[ConfigureMqttClient] Payload: {Payload}", Encoding.UTF8.GetString(arg.ApplicationMessage.Payload));
+
+            string[] splitTopic = arg.ApplicationMessage.Topic.Split('/');
+            string topic = splitTopic[0];
 
             if (arg.ApplicationMessage.Topic.StartsWith("mevents/"))
             {
@@ -186,6 +195,9 @@ public class ManagedMqttClientService : IManagedMqttClientService
                         case "userapp":
                             //listener.Listen(JsonConvert.DeserializeObject<Userapp>($"{evt.ZebraManagementEvents.Data}", options), arg.ApplicationMessage.Topic);
                             break;
+                        case "gpo":
+                            //listener.Listen(JsonConvert.DeserializeObject<Userapp>($"{evt.ZebraManagementEvents.Data}", options), arg.ApplicationMessage.Topic);
+                            break;
                         default:
                             throw new Exception($"No event type defined for: {evt.ZebraManagementEvents.Type}");
                     }
@@ -202,6 +214,7 @@ public class ManagedMqttClientService : IManagedMqttClientService
             {
                 try
                 {
+                    TagEvent zebraTagEvent = JsonSerializer.Deserialize<TagEvent>(arg.ApplicationMessage.PayloadSegment, _settings) ?? throw new JsonException("deseriaze to null not allowed");
                     ZebraMqttApplicationMessage evt = mapper.Map<ZebraMqttApplicationMessage>(arg.ApplicationMessage);
                     var options = new JsonSerializerOptions();
                     options.Converters.Add(new DateTimeConverter());
@@ -259,6 +272,35 @@ public class ManagedMqttClientService : IManagedMqttClientService
 
                             }
                             break;
+
+                        case "DIRECTIONALITY":
+                            DirectionalityTagPayload directionalityTagPayload = JsonSerializer.Deserialize<DirectionalityTagPayload>((JsonElement)zebraTagEvent.Data, _settings) ?? throw new JsonException("deserializing to null is not supported");
+                            ZebraDirectionalityTagData directionalityTagData = mapper.Map<ZebraDirectionalityTagData>(directionalityTagPayload);
+
+                            using (IServiceScope scope = serviceScopeFactory.CreateScope())
+                            {
+                                IZebraMqttEventPublisher client = scope.ServiceProvider.GetService<IZebraMqttEventPublisher>() ?? throw new InvalidOperationException("Could not resolve service for ITagMessagePublisher");
+
+                                directionalityTagData.ReaderName = splitTopic[^1].ToUpper();
+                                directionalityTagData.Timestamp = zebraTagEvent.Timestamp;
+                                await client.Publish(directionalityTagData);
+                            }
+                            return;
+
+                        case "DIRECTIONALITY_RAW":
+
+                            RawDirectionalityTagPayload rawDirectionalityTagPayload = JsonSerializer.Deserialize<RawDirectionalityTagPayload>((JsonElement)zebraTagEvent.Data, _settings) ?? throw new JsonException("deserializing to null is not supported");
+                            ZebraRawDirectionalityTagData rawDirectionalityTagData = mapper.Map<ZebraRawDirectionalityTagData>(rawDirectionalityTagPayload);
+
+                            using (IServiceScope scope = serviceScopeFactory.CreateScope())
+                            {
+                                IZebraMqttEventPublisher client = scope.ServiceProvider.GetService<IZebraMqttEventPublisher>() ?? throw new InvalidOperationException("Could not resolve service for ITagMessagePublisher");
+
+                                rawDirectionalityTagData.ReaderName = splitTopic[^1].ToUpper();
+                                rawDirectionalityTagData.Timestamp = zebraTagEvent.Timestamp;
+                                await client.Publish(rawDirectionalityTagData);
+                            }
+                            return;
 
                         case "CUSTOM":
                             //da tagevent.data diventa tagdata

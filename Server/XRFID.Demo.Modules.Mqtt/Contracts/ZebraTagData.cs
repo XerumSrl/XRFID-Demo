@@ -4,7 +4,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Xerum.XFramework.Common.Enums;
-using Xerum.XFramework.MassTransit;
 using XRFID.Demo.Modules.Mqtt.Interfaces;
 
 namespace XRFID.Demo.Modules.Mqtt.Contracts;
@@ -13,7 +12,7 @@ namespace XRFID.Demo.Modules.Mqtt.Contracts;
 /// TAG Event
 /// </summary>
 [DataContract]
-public class ZebraTagData : IMqttTagData, IRequestMessage
+public class ZebraTagData : IMqttTagData
 {
     public DateTime Timestamp { get; set; } = DateTime.Now;
 
@@ -27,7 +26,7 @@ public class ZebraTagData : IMqttTagData, IRequestMessage
     public string HostName { get; set; }
 
     /// <summary>
-    /// Host name of the reader
+    /// EventNum
     /// </summary>
     /// <value>Host name of the reader</value>
     [DataMember(Name = "eventNum", EmitDefaultValue = false)]
@@ -35,7 +34,7 @@ public class ZebraTagData : IMqttTagData, IRequestMessage
     public int? EventNum { get; set; }
 
     /// <summary>
-    /// Host name of the reader
+    /// Format
     /// </summary>
     /// <value>Host name of the reader</value>
     [DataMember(Name = "format", EmitDefaultValue = false)]
@@ -43,7 +42,7 @@ public class ZebraTagData : IMqttTagData, IRequestMessage
     public string? Format { get; set; }
 
     /// <summary>
-    /// Host name of the reader
+    /// IdHex
     /// </summary>
     /// <value>Host name of the reader</value>
     [DataMember(Name = "idHex", EmitDefaultValue = false)]
