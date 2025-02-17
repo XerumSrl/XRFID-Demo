@@ -44,7 +44,6 @@ public class PointDataStores
                 {
                     DateTimeOffset initTimestamp = points.Min(p => p.Timestamp);
 
-
                     if (newPoint.Timestamp < initTimestamp + TimeSpan.FromMilliseconds(500))
                     {
                         points.Add(newPoint);
@@ -67,6 +66,7 @@ public class PointDataStores
                             Timestamp = newPoint.Timestamp
                         };
 
+                        p.Timestamp = p.Timestamp.ToOffset(TimeSpan.FromHours(1));
 
                         points.Clear();
 

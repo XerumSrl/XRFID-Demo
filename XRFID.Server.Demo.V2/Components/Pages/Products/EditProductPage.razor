@@ -37,7 +37,7 @@
     string[] errors = { };
     MudForm form;
     private Product? product;
-    private ProductModel model;
+    private ProductModel model = new ProductModel();
     private string skuName = "Sku Not found";
     private bool isDisabled = false;
 
@@ -67,13 +67,13 @@
                 Name = product.Name ?? string.Empty,
                 Description = product.Description,
                 Epc = product.Epc,
+                Reference = product.Reference,
                 ContentQuantity = product.ContentQuantity,
                 SerialNumber = product.SerialNumber,
                 Note = product.Note,
                 SkuId = product.SkuId ?? Guid.Empty,
                 SkuReference = sku.Reference
-                
-                
+ 
             };
 
     }
