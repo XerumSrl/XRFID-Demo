@@ -391,9 +391,6 @@
                 Timestamp = DateTime.Now,
             });
 
-
-
-
         gpi2IsOn = await _worker.StartStop(2);
         StateHasChanged();
 
@@ -422,10 +419,8 @@
             });
 
 
-
         gpi3IsOn = await _worker.StartStop(3);
         StateHasChanged();
-
     }
 
     private Func<CheckItemModel, string> _cellStyleFunc => x =>

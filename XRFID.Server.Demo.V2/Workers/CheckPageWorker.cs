@@ -37,6 +37,7 @@ public class CheckPageWorker(IServiceProvider _serviceProvider, ILogger<CheckPag
 
     public async Task SetViewItem(string epc)
     {
+
         CheckItemModel? foundItem = _viewItems.Where(w => w.Epc.ToUpper() == epc.ToUpper()).FirstOrDefault();
 
         await using AsyncServiceScope scope = _serviceProvider.CreateAsyncScope();
@@ -77,6 +78,7 @@ public class CheckPageWorker(IServiceProvider _serviceProvider, ILogger<CheckPag
                 PrevZoneName = mi.PreviousZoneName ?? string.Empty
             });
         }
+
     }
 
     public List<CheckItemModel> GetViewItems()

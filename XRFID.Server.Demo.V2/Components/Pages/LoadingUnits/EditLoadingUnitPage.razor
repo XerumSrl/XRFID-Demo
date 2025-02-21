@@ -14,6 +14,7 @@
 @inject IProductRepository productRepository;
 @inject IUnitOfWork uowk;
 @inject IMapper mapper;
+@inject ILogger<EditLoadingUnitPage> _logger;
 
 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
     <MudStack Class="my-3">
@@ -54,15 +55,15 @@
 <MudSpacer />
 
 <MudDataGrid Items="@ItemList"
-             ReadOnly="true"
-             SortMode="SortMode.Single" Filterable="true" QuickFilter="@_quickFilter" Striped="true">
+ReadOnly="true"
+SortMode="SortMode.Single" Filterable="true" QuickFilter="@_quickFilter" Striped="true">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Items</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
-                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
         <MudButton Class="ml-3" Variant="@Variant.Filled" Color="@Color.Secondary" SartIcon="@Icons.Material.Filled.Add"
-                   OnClick="@(() => AddItem())">Add</MudButton>
+        OnClick="@(() => AddItem())">Add</MudButton>
     </ToolBarContent>
     <Columns>
         <TemplateColumn Filterable="false" Sortable="false">
@@ -147,7 +148,7 @@
             e => e.SetProperty(p => p.Name, model.Name)
                   .SetProperty(p => p.Reference, model.Reference)
                   .SetProperty(p => p.Description, model.Description));
-       
+
         Navigation.NavigateTo($"LoadingUnits");
 
         StateHasChanged();
@@ -171,7 +172,7 @@
             if (checkItem is not null)
             {
                 await loadingUnitItemRepository.ExecuteDeleteAsync(i => i.Id == item.Id);
-                
+
                 ItemList.Remove(item);
             }
             else
@@ -210,22 +211,35 @@
                 return;
             }
 
-            var result = await loadingUnitItemRepository.CreateAsync(new LoadingUnitItem
+            LoadingUnitItem? result = null;
+
+            try
             {
-                    Name = selectedProduct.Name,
-                    Reference = selectedProduct.Reference,
+                result = await loadingUnitItemRepository.CreateAsync(new LoadingUnitItem
+                    {
+                        Name = selectedProduct.Name,
+                        Reference = selectedProduct.Reference,
 
-                    Description = selectedProduct.Description,
-                    SerialNumber = selectedProduct.SerialNumber,
-                    Epc = selectedProduct.Epc,
+                        Description = selectedProduct.Description,
+                        SerialNumber = selectedProduct.SerialNumber,
+                        Epc = selectedProduct.Epc,
 
-                    Status = ItemStatus.NotFound,
+                        Status = ItemStatus.NotFound,
 
-                    LoadingUnitId = Id,
-            });
-            await uowk.SaveAsync();
-            ItemList.Add(result);
-            snackbar.Add($"Item {result.Name} added", MudBlazor.Severity.Success);
+                        LoadingUnitId = Id,
+                    });
+                await uowk.SaveAsync();
+                ItemList.Add(result);
+                snackbar.Add($"Item {result.Name} added", MudBlazor.Severity.Success);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("Error adding loading unit item: " + e.Message);
+                if(result is not null)
+                    snackbar.Add($"Can't added {result}: " + e.Message, MudBlazor.Severity.Error);
+            }
+            
+            
             selectedProduct = null;
 
             adding = false;
